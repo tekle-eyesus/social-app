@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "83395238285",
+    "project_id": "ring-social-app",
+    "storage_bucket": "ring-social-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83395238285:android:6d6504866219ffba4dc5c4",
+        "android_client_info": {
+          "package_name": "com.example.socialapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1iGB7ywmjeR_G__9fRvyfmxIARbDGEmQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
