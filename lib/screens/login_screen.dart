@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
-      if (context.mounted) Navigator.pop(context);
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       DisplayErrorMessage(e.code, context);
@@ -48,21 +48,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 "assets/images/logo2.png",
                 width: 100,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
-              Text(
+              const Text(
                 "R I N G",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextfield(
                   hintText: "Email Address",
                   obscureText: false,
                   controller: emailController),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextfield(

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
@@ -21,6 +22,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final TextEditingController confirmPassController = TextEditingController();
 
+  Future<void> addUserToDB(UserCredential? userData) async {
+    if (userData?.user != null && userData != null) {
+      FirebaseFirestore db = FirebaseFirestore.instance;
+      await db.collection("users").doc(userData.user?.email).set({
+        "email": userData.user?.email,
+        "username": usernameController.text,
+      }).onError((error, stackTrace) => print(error));
+    }
+  }
+
   void handleRegister() async {
     //show progress bar
     showDialog(
@@ -38,7 +49,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       UserCredential? usercreditial = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: emailController.text, password: passwordController.text);
-      Navigator.pop(context);
+      addUserToDB(usercreditial);
+      if (context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       DisplayErrorMessage(e.code, context);
