@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
@@ -94,6 +95,15 @@ class _HomeScreenState extends State<HomeScreen> {
     "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg"
   ];
 
+  List<String> headers = [
+    "All",
+    "Music",
+    "Video",
+    "Podcasts",
+    "Rituals",
+    "Live"
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         foregroundColor: AppColors.primaryText,
 
-        centerTitle: true,
         // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         backgroundColor: AppColors.background,
         elevation: 0,
@@ -113,52 +122,66 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: 'sofa',
               fontWeight: FontWeight.w800),
         ),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) {
+                return PostScreen();
+              }));
+            },
+            child: Container(
+              margin: EdgeInsets.all(5),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.blue.shade500,
+              ),
+              child: Icon(
+                Icons.add,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
           Container(
-            margin: const EdgeInsets.all(.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) {
-                      return PostScreen();
-                    }));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(10),
+            height: 60,
+            child: Expanded(
+              child: ListView.builder(
+                itemCount: headers.length,
+                // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 1),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  return Container(
+                    alignment: Alignment.center,
+                    width: 100,
+                    margin:
+                        EdgeInsets.only(top: 10, left: 5, right: 5, bottom: 10),
                     decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: const Color.fromARGB(255, 4, 25, 58),
+                            offset: Offset(1, 1.3),
+                            blurRadius: 2.0)
+                      ],
+                      color: Colors.blue.shade300,
                       borderRadius: BorderRadius.circular(10),
-                      color: Colors.blue.shade500,
                     ),
-                    child: Icon(
-                      Icons.image,
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      headers[index],
+                      style: TextStyle(
+                          color: Colors.blue.shade900,
+                          fontFamily: 'poppins',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17),
                     ),
-                  ),
-                ),
-                Container(
-                  width: 290,
-                  margin: EdgeInsets.all(10),
-                  padding: EdgeInsets.only(left: 7),
-                  decoration: BoxDecoration(
-                      color: AppColors.secondaryColor,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextField(
-                    controller: postMessageController,
-                    decoration: InputDecoration(
-                        hintStyle: TextStyle(color: Colors.grey.shade700),
-                        border: InputBorder.none,
-                        hintText: "write some thing..."),
-                  ),
-                ),
-                PostButton(
-                  onTap: handlePost,
-                  icon: Icons.mark_chat_read_rounded,
-                ),
-              ],
+                  );
+                },
+              ),
             ),
           ),
           Expanded(
