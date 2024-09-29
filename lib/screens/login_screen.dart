@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       DisplayErrorMessage(e.code, context);
@@ -37,7 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      // backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.blue.shade100,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(25),
@@ -53,7 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const Text(
                 "R I N G",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    fontFamily: 'poppins'),
               ),
               const SizedBox(
                 height: 10,
@@ -99,8 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     "Already have an account?",
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                    ),
+                        // color: Theme.of(context).colorScheme.inversePrimary,
+                        fontFamily: 'poppins'),
                   ),
                   const SizedBox(
                     width: 3,
@@ -109,7 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: widget.onTap,
                     child: const Text(
                       "Register Here",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'poppins',
+                          color: Color.fromARGB(255, 1, 95, 173)),
                     ),
                   )
                 ],

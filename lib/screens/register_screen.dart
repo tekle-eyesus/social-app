@@ -60,20 +60,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      // backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.blue.shade100,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(25),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: ListView(
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.person),
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: 100,
+                height: 100,
+                child: Image.asset(
+                  "assets/images/logo2.png",
+                  width: 100,
+                ),
+              ),
               const SizedBox(
                 height: 25,
               ),
-              const Text(
-                "R I N G",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "R E G I S T ER",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        fontFamily: 'poppins'),
+                  ),
+                ],
               ),
               const SizedBox(
                 height: 10,
@@ -122,6 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text(
                     "Already Registerd?",
                     style: TextStyle(
+                      fontFamily: 'poppins',
                       color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                   ),
@@ -132,7 +152,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onTap: widget.onTap,
                     child: const Text(
                       "Login Here",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'poppins',
+                          color: Color.fromARGB(255, 5, 31, 163)),
                     ),
                   )
                 ],

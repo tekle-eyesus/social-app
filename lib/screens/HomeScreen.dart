@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/screens/post_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/custom_drawer.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
@@ -32,10 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           });
-
-      await db.collection("posts").doc(loggedUser!.email).set({
+//what about
+      await db.collection("posts").doc().set({
         "content": postMessageController.text,
-        "email": loggedUser.email,
+        "email": loggedUser!.email,
         "timeStamp": DateTime.now().toIso8601String(),
       });
       Navigator.pop(context);
@@ -84,6 +85,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  List<String> imageUrl = [
+    "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg",
+    "https://media.istockphoto.com/id/1435220822/photo/african-american-software-developer.jpg?s=612x612&w=0&k=20&c=JESGRQ2xqRH9ZcJzvZBHZIZKVY8MDejBSOfxeM-i5e4=",
+    "https://images.ctfassets.net/19dvw6heztyg/1Kh1hVqbZSsSL4HM5TrJX3/6e19c050bd007e99f915e5034b87ebb6/seo-earn-more-as-developer?w=1200&h=600&fit=fill&q=75&fm=jpg",
+    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2022/08/web_developer.jpeg.jpg",
+    "https://img.freepik.com/free-vector/hand-drawn-web-developers_23-2148819604.jpg",
+    "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg"
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,9 +121,23 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                PostButton(
-                  onTap: () {},
-                  icon: Icons.image_sharp,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) {
+                      return PostScreen();
+                    }));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.blue.shade500,
+                    ),
+                    child: Icon(
+                      Icons.image,
+                    ),
+                  ),
                 ),
                 Container(
                   width: 290,
@@ -222,23 +246,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               Container(
+                                  height: 200,
                                   child: Image.network(
-                                "https://static1.colliderimages.com/wordpress/wp-content/uploads/2023/06/cersei-lannister-jon-snow-and-daenerys-targaryen-from-game-of-thrones.jpg",
-                                fit: BoxFit
-                                    .cover, // Fill the grid tile with the image
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Center(
-                                      child: Center(
-                                          child: CircularProgressIndicator(
-                                    color: Colors.blue.shade900,
-                                  )));
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Center(child: Icon(Icons.error));
-                                },
-                              )),
+                                    imageUrl[index],
+                                    width: double.infinity,
+                                    fit: BoxFit
+                                        .fill, // Fill the grid tile with the image
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                          child: Center(
+                                              child: CircularProgressIndicator(
+                                        color: Colors.blue.shade900,
+                                      )));
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(child: Icon(Icons.error));
+                                    },
+                                  )),
                               Row(
                                 children: [
                                   IconButton(

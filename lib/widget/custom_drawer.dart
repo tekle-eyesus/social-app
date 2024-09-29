@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:socialapp/screens/HomeScreen.dart';
+import 'package:socialapp/screens/login_screen.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -11,7 +14,8 @@ class MyDrawer extends StatelessWidget {
     }
 
     return Drawer(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      // backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.blue.shade200,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -20,7 +24,7 @@ class MyDrawer extends StatelessWidget {
               DrawerHeader(
                   child: Icon(
                 Icons.heart_broken,
-                color: Theme.of(context).colorScheme.inversePrimary,
+                color: Theme.of(context).colorScheme.primary,
               )),
               const SizedBox(
                 height: 20,
@@ -28,11 +32,12 @@ class MyDrawer extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  leading: Icon(
-                    Icons.home,
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                  leading: Icon(Icons.home,
+                      color: const Color.fromARGB(255, 20, 34, 54)),
+                  title: const Text(
+                    "H O M E",
+                    style: TextStyle(fontFamily: 'poppins'),
                   ),
-                  title: const Text("H O M E"),
                   onTap: () {
                     Navigator.pop(context);
                   },
@@ -46,9 +51,10 @@ class MyDrawer extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(
                     Icons.people_sharp,
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: const Color.fromARGB(255, 20, 34, 54),
                   ),
-                  title: const Text("P R O F I L E"),
+                  title: const Text("P R O F I L E",
+                      style: TextStyle(fontFamily: 'poppins')),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, "/profileScreen");
@@ -61,11 +67,12 @@ class MyDrawer extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.person,
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: const Color.fromARGB(255, 20, 34, 54),
                   ),
-                  title: const Text("U S E R S"),
+                  title: const Text("U S E R S",
+                      style: TextStyle(fontFamily: 'poppins')),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, "/usersScreen");
@@ -82,9 +89,14 @@ class MyDrawer extends StatelessWidget {
             child: ListTile(
               leading: Icon(
                 Icons.logout_outlined,
-                color: Theme.of(context).colorScheme.inversePrimary,
+                color: Colors.red.shade900,
               ),
-              title: const Text("L O G O U T"),
+              title: const Text(
+                "L O G O U T",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onTap: handleSignOut,
             ),
           )
