@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:socialapp/theme/app_colors.dart';
+import 'package:socialapp/widget/profile_post.dart';
+import 'package:socialapp/widget/profile_summery.dart';
 import "./../helpers/helper_functions.dart";
 
 class ProfileScreen extends StatefulWidget {
@@ -42,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue.shade100,
+      backgroundColor: AppColors.surface,
       body: Column(
         children: [
           const SizedBox(
@@ -82,23 +87,79 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Map<String, dynamic> data = snapshot.data!;
                   return Column(
                     children: [
-                      Image.network(
-                        "https://img.freepik.com/free-photo/androgynous-avatar-non-binary-queer-person_23-2151100270.jpg?size=338&ext=jpg&ga=GA1.1.1819120589.1727481600&semt=ais_hybrid",
-                        fit: BoxFit.cover,
-                        width: 100,
-                        height: 100,
+                      Column(
+                        children: [
+                          Container(
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              // border: Border.all(
+                              //   color:
+                              //       Colors.blue.shade800.withOpacity(0.7),
+                              //   width: 4,
+                              // ),
+                            ),
+                            child: Image.network(
+                              data["profilePic"],
+                              fit: BoxFit.cover,
+                              height: 140,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        data['username'],
-                        style: const TextStyle(
-                          fontSize: 25,
-                          fontFamily: 'poppins',
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "\@" + data['username'],
+                            style: const TextStyle(
+                              fontSize: 37,
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            data['email'],
+                            style: const TextStyle(fontFamily: 'poppins'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
                         ),
-                      ),
-                      Text(
-                        data['email'],
-                        style: const TextStyle(fontFamily: 'poppins'),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.surface,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromARGB(255, 23, 40, 53),
+                              offset: Offset(0.2, 0.1),
+                              blurRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ProfileSummery(title: "Posts", amount: 12),
+                            ProfileSummery(title: "Likes", amount: 23),
+                            ProfileSummery(title: "Followers", amount: 8),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 20),
 
@@ -108,8 +169,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         indicatorColor: Colors.black,
                         labelColor: Colors.black,
                         tabs: const [
-                          Tab(text: "Posts"),
-                          Tab(text: "Favorites"),
+                          Tab(
+                            icon: Icon(
+                              Icons.post_add,
+                              size: 30,
+                            ),
+                          ),
+                          Tab(
+                            icon: Icon(
+                              Icons.favorite_border_outlined,
+                              size: 30,
+                            ),
+                          ),
                         ],
                       ),
                       Expanded(
@@ -140,34 +211,96 @@ class _ProfileScreenState extends State<ProfileScreen>
 
 // Dummy PostGridView Widget (You can replace this with real video widgets)
 class PostGridView extends StatelessWidget {
-  List<String> imageUrl = [
-    "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg",
-    "https://media.istockphoto.com/id/1435220822/photo/african-american-software-developer.jpg?s=612x612&w=0&k=20&c=JESGRQ2xqRH9ZcJzvZBHZIZKVY8MDejBSOfxeM-i5e4=",
-    "https://images.ctfassets.net/19dvw6heztyg/1Kh1hVqbZSsSL4HM5TrJX3/6e19c050bd007e99f915e5034b87ebb6/seo-earn-more-as-developer?w=1200&h=600&fit=fill&q=75&fm=jpg",
-    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2022/08/web_developer.jpeg.jpg",
-    "https://img.freepik.com/free-vector/hand-drawn-web-developers_23-2148819604.jpg"
-  ];
+  User? u = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1, // 3 columns for posts
-        childAspectRatio: 9 / 5, // Aspect ratio for posts
-      ),
-      itemCount: imageUrl.length, // Number of posts
-      itemBuilder: (context, index) {
-        return Container(
-          height: 100,
-          margin: const EdgeInsets.all(4.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.blueAccent,
-          ),
-          child: Image.network(
-            imageUrl[index],
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("posts")
+          .where('email', isEqualTo: u!.email.toString())
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              snapshot.error.toString(),
+            ),
+          );
+        } else if (snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              "No Post Available",
+              style: TextStyle(
+                  color: Colors.blue.shade900, fontWeight: FontWeight.bold),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          List<DocumentSnapshot> posts = snapshot.data!.docs;
+
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1, // 3 columns for posts
+              childAspectRatio: 9 / 5, // Aspect ratio for posts
+            ),
+            itemCount: posts.length, // Number of posts
+            itemBuilder: (context, index) {
+              Map<String, dynamic> postData =
+                  posts[index].data() as Map<String, dynamic>;
+              return Container(
+                clipBehavior: Clip.hardEdge,
+                height: 100,
+                margin: const EdgeInsets.symmetric(
+                  vertical: 4.0,
+                  horizontal: 20,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.blueAccent,
+                ),
+                child: Stack(
+                  children: [
+                    Image.network(
+                      postData["imageUrl"],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ProfileMetaData(
+                                  icon: Icons.favorite_border, content: '2k'),
+                              ProfileMetaData(icon: Icons.share, content: '55'),
+                              ProfileMetaData(
+                                  icon: Icons.message_outlined, content: '25k'),
+                            ],
+                          )),
+                    )
+                  ],
+                ),
+                // child: Image.network(
+                //   imageUrl[index],
+                //   fit: BoxFit.cover,
+                //   width: double.infinity,
+                // ),
+              );
+            },
+          );
+        }
+        return const Center(
+          child: Text("Something went wrong!!"),
         );
       },
     );

@@ -54,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       addUserToDB(usercreditial);
       if (context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
       DisplayErrorMessage(e.code, context);
     }
   }
