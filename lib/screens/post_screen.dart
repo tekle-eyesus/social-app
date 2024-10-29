@@ -54,6 +54,7 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   void handlePost(String? imageUrl) async {
+    var userData;
     User? loggedUser = FirebaseAuth.instance.currentUser;
     FirebaseFirestore db = FirebaseFirestore.instance;
     if (_messageController.text.isNotEmpty) {
@@ -66,11 +67,25 @@ class _PostScreenState extends State<PostScreen> {
               ),
             );
           });
+
+      final docRef = db.collection("users").doc(loggedUser!.email);
+      await docRef.get().then(
+        (DocumentSnapshot doc) {
+          userData = doc.data() as Map<String, dynamic>;
+          // ...
+          print(userData);
+        },
+        onError: (e) => print("Error getting document: $e"),
+      );
+
 //what about
+      print("from below the userata ${_messageController.text}");
       await db.collection("posts").doc().set({
         "imageUrl": imageUrl,
         "content": _messageController.text,
-        "email": loggedUser!.email,
+        "email": loggedUser.email,
+        "username": userData['username'],
+        "profile": userData['profilePic'],
         "timeStamp": DateTime.now().toIso8601String(),
       });
       Navigator.pop(context);
@@ -127,6 +142,7 @@ class _PostScreenState extends State<PostScreen> {
     }
 
     print(imageUrl);
+    print(message);
 
     handlePost(imageUrl);
 
@@ -154,7 +170,7 @@ class _PostScreenState extends State<PostScreen> {
               color: Colors.blue.shade900,
             )),
         backgroundColor: Colors.blue.shade100,
-        title: Text(
+        title: const Text(
           'Create Post',
           style: TextStyle(
             fontFamily: 'poppins',
@@ -167,7 +183,8 @@ class _PostScreenState extends State<PostScreen> {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.only(top: 10, bottom: 10, left: 6, right: 3),
+              padding:
+                  const EdgeInsets.only(top: 10, bottom: 10, left: 6, right: 3),
               decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(10)),
@@ -216,9 +233,10 @@ class _PostScreenState extends State<PostScreen> {
             GestureDetector(
               onTap: () async {
                 await createPost(_messageController.text, _image);
+                print(_messageController.text);
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Post Created!')));
-                _messageController.clear();
+                // _messageController.clear();
                 setState(() {
                   _image = null;
                 });
@@ -231,7 +249,7 @@ class _PostScreenState extends State<PostScreen> {
                 decoration: BoxDecoration(
                     color: Colors.blue.shade600,
                     borderRadius: BorderRadius.circular(10)),
-                child: Text(
+                child: const Text(
                   'Post',
                   style: TextStyle(
                       color: Colors.black, fontFamily: 'poppins', fontSize: 20),

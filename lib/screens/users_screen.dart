@@ -58,18 +58,20 @@ class UsersScreen extends StatelessWidget {
                     FirebaseFirestore.instance.collection('users').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
+                    return const Center(
                       child: CircularProgressIndicator(),
                     );
                   } else if (snapshot.hasError) {
                     return Text(snapshot.error.toString());
                   } else if (snapshot.data!.docs.isEmpty) {
-                    return Text("No users found!!");
+                    return const Text("No users found!!");
                   } else if (snapshot.hasData) {
+                    //List of all users data in the database
                     List<DocumentSnapshot> users = snapshot.data!.docs;
                     return ListView.builder(
                       itemCount: users.length,
                       itemBuilder: (context, index) {
+                        //single user data as a map
                         Map<String, dynamic> userData =
                             users[index].data() as Map<String, dynamic>;
                         return Container(
@@ -86,16 +88,16 @@ class UsersScreen extends StatelessWidget {
                                   color: Colors.lightBlue.shade900,
                                   size: 27,
                                 )),
-                            leading: Icon(Icons.person),
+                            leading: const Icon(Icons.person),
                             title: Text(
                               userData['username'],
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontFamily: 'poppins',
                               ),
                             ),
                             subtitle: Text(
                               userData['email'],
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontStyle: FontStyle.italic,
                               ),
                             ),

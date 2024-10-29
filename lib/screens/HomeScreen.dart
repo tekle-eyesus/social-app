@@ -86,14 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  List<String> imageUrl = [
-    "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg",
-    "https://media.istockphoto.com/id/1435220822/photo/african-american-software-developer.jpg?s=612x612&w=0&k=20&c=JESGRQ2xqRH9ZcJzvZBHZIZKVY8MDejBSOfxeM-i5e4=",
-    "https://images.ctfassets.net/19dvw6heztyg/1Kh1hVqbZSsSL4HM5TrJX3/6e19c050bd007e99f915e5034b87ebb6/seo-earn-more-as-developer?w=1200&h=600&fit=fill&q=75&fm=jpg",
-    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2022/08/web_developer.jpeg.jpg",
-    "https://img.freepik.com/free-vector/hand-drawn-web-developers_23-2148819604.jpg",
-    "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg"
-  ];
+  // List<String> imageUrl = [
+  //   "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg",
+  //   "https://media.istockphoto.com/id/1435220822/photo/african-american-software-developer.jpg?s=612x612&w=0&k=20&c=JESGRQ2xqRH9ZcJzvZBHZIZKVY8MDejBSOfxeM-i5e4=",
+  //   "https://images.ctfassets.net/19dvw6heztyg/1Kh1hVqbZSsSL4HM5TrJX3/6e19c050bd007e99f915e5034b87ebb6/seo-earn-more-as-developer?w=1200&h=600&fit=fill&q=75&fm=jpg",
+  //   "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2022/08/web_developer.jpeg.jpg",
+  //   "https://img.freepik.com/free-vector/hand-drawn-web-developers_23-2148819604.jpg",
+  //   "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg"
+  // ];
 
   List<String> headers = [
     "All",
@@ -107,13 +107,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      drawer: MyDrawer(),
+      backgroundColor: Colors.white,
+      drawer: const MyDrawer(),
       appBar: AppBar(
         foregroundColor: AppColors.primaryText,
-
         // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         title: const Text(
           "R I N G",
@@ -167,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             offset: Offset(1, 1.3),
                             blurRadius: 2.0)
                       ],
-                      color: Colors.blue.shade300,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -219,17 +218,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 340,
                           margin: EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                              color: AppColors.primaryVariant,
+                              color: AppColors.background,
                               borderRadius: BorderRadius.circular(10)),
                           child: Column(
                             children: [
                               Row(
                                 children: [
                                   Container(
+                                    clipBehavior: Clip.hardEdge,
                                     margin: EdgeInsets.only(left: 5, right: 5),
-                                    child: Icon(
-                                      Icons.circle_notifications_sharp,
-                                      size: 45,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: Image.network(
+                                      postData['profile'],
+                                      height: 50,
                                     ),
                                   ),
                                   Column(
@@ -238,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        postData['email'].toString(),
+                                        postData['username'].toString(),
                                         style: TextStyle(
                                             color: const Color.fromARGB(
                                                 255, 21, 45, 81),
@@ -271,10 +274,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               Container(
                                   height: 200,
                                   child: Image.network(
-                                    imageUrl[index],
+                                    postData['imageUrl'],
                                     width: double.infinity,
                                     fit: BoxFit
-                                        .fill, // Fill the grid tile with the image
+                                        .cover, // Fill the grid tile with the image
                                     loadingBuilder:
                                         (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;

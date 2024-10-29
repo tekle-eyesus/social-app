@@ -10,12 +10,12 @@ class PostButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.blue.shade500,
         ),
-        child: Icon(
+        child: const Icon(
           Icons.post_add,
         ),
       ),

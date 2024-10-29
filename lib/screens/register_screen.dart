@@ -21,13 +21,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController usernameController = TextEditingController();
 
   final TextEditingController confirmPassController = TextEditingController();
-
+//add user data to db
   Future<void> addUserToDB(UserCredential? userData) async {
     if (userData?.user != null && userData != null) {
       FirebaseFirestore db = FirebaseFirestore.instance;
       await db.collection("users").doc(userData.user?.email).set({
         "email": userData.user?.email,
         "username": usernameController.text,
+        "profilePic":
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTSKbCFe_QYSVH-4FpaszXvakr2Eti9eAJpQ&s"
       }).onError((error, stackTrace) => print(error));
     }
   }
