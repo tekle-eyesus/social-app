@@ -10,6 +10,7 @@ import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/custom_drawer.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
 import 'package:socialapp/widget/post_btn.dart';
+import 'package:socialapp/widget/post_stats.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -86,14 +87,33 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // List<String> imageUrl = [
-  //   "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg",
-  //   "https://media.istockphoto.com/id/1435220822/photo/african-american-software-developer.jpg?s=612x612&w=0&k=20&c=JESGRQ2xqRH9ZcJzvZBHZIZKVY8MDejBSOfxeM-i5e4=",
-  //   "https://images.ctfassets.net/19dvw6heztyg/1Kh1hVqbZSsSL4HM5TrJX3/6e19c050bd007e99f915e5034b87ebb6/seo-earn-more-as-developer?w=1200&h=600&fit=fill&q=75&fm=jpg",
-  //   "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2022/08/web_developer.jpeg.jpg",
-  //   "https://img.freepik.com/free-vector/hand-drawn-web-developers_23-2148819604.jpg",
-  //   "https://t4.ftcdn.net/jpg/03/69/19/81/360_F_369198116_K0sFy2gRTo1lmIf5jVGeQmaIEibjC3NN.jpg"
-  // ];
+  String timeAgoFromString(String timestampString) {
+    try {
+      // Parse the timestamp string to DateTime
+      DateTime postDate = DateTime.parse(timestampString);
+      Duration difference = DateTime.now().difference(postDate);
+
+      if (difference.inSeconds < 60) {
+        return "${difference.inSeconds}s ago";
+      } else if (difference.inMinutes < 60) {
+        return "${difference.inMinutes} min ago";
+      } else if (difference.inHours < 24) {
+        return "${difference.inHours} hr ago";
+      } else if (difference.inDays < 7) {
+        return "${difference.inDays} days ago";
+      } else if (difference.inDays < 30) {
+        return "${(difference.inDays / 7).floor()} week(s) ago";
+      } else if (difference.inDays < 365) {
+        return "${(difference.inDays / 30).floor()} month(s) ago";
+      } else {
+        return "${(difference.inDays / 365).floor()} year(s) ago";
+      }
+    } catch (e) {
+      // Handle any parsing errors or invalid timestamp format
+      print("Error parsing timestamp: $e");
+      return "Invalid date";
+    }
+  }
 
   List<String> headers = [
     "All",
@@ -216,9 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             posts[index].data() as Map<String, dynamic>;
                         return Container(
                           height: 340,
-                          margin: EdgeInsets.all(6),
+                          margin: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                              color: AppColors.background,
+                              color: Color.fromARGB(255, 251, 244, 244),
                               borderRadius: BorderRadius.circular(10)),
                           child: Column(
                             children: [
@@ -235,6 +255,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       height: 50,
                                     ),
                                   ),
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -247,14 +270,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 255, 21, 45, 81),
                                             fontWeight: FontWeight.w600,
                                             fontFamily: 'poppins',
-                                            fontSize: 18),
+                                            fontSize: 22),
                                       ),
-                                      Text(
-                                        postData['timeStamp'].toString(),
-                                        style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 21, 45, 81),
-                                            fontWeight: FontWeight.w500),
+                                      Row(
+                                        children: [
+                                          Text("UI/UX designer"),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            timeAgoFromString(
+                                                    postData['timeStamp'])
+                                                .toString(),
+                                            style: TextStyle(
+                                                color: const Color.fromARGB(
+                                                    255, 21, 45, 81),
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ],
                                       )
                                     ],
                                   ),
@@ -272,6 +305,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               Container(
+                                  clipBehavior: Clip.hardEdge,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                   height: 200,
                                   child: Image.network(
                                     postData['imageUrl'],
@@ -291,23 +328,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       return Center(child: Icon(Icons.error));
                                     },
                                   )),
-                              Row(
+                              const Row(
                                 children: [
-                                  IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.thumb_up,
-                                      )),
-                                  IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.comment,
-                                      )),
-                                  IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.share_sharp,
-                                      )),
+                                  PostStats(
+                                      icon: Icons.favorite_border,
+                                      value: "123"),
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                  PostStats(icon: Icons.chat, value: "45"),
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                  PostStats(
+                                      icon: Icons.share_outlined, value: "12k"),
                                 ],
                               )
                             ],
