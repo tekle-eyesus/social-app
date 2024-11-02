@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -115,20 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  List<String> headers = [
-    "All",
-    "Music",
-    "Video",
-    "Podcasts",
-    "Rituals",
-    "Live"
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: const MyDrawer(),
+      // drawer: const MyDrawer(),
       appBar: AppBar(
         foregroundColor: AppColors.primaryText,
         // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -165,44 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            height: 60,
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: headers.length,
-                // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //     crossAxisCount: 1),
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return Container(
-                    alignment: Alignment.center,
-                    width: 100,
-                    margin:
-                        EdgeInsets.only(top: 10, left: 5, right: 5, bottom: 10),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                            color: const Color.fromARGB(255, 4, 25, 58),
-                            offset: Offset(1, 1.3),
-                            blurRadius: 2.0)
-                      ],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      headers[index],
-                      style: TextStyle(
-                          color: Colors.blue.shade900,
-                          fontFamily: 'poppins',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 17),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
           Expanded(
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
