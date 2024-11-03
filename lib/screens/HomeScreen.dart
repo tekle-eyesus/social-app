@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/screens/post_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
@@ -119,39 +120,55 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      // drawer: const MyDrawer(),
+      backgroundColor: Colors.blue.shade100,
       appBar: AppBar(
+        centerTitle: true,
+        toolbarHeight: 65,
+        leadingWidth: 45,
         foregroundColor: AppColors.primaryText,
-        // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text(
-          "R I N G",
-          style: TextStyle(
-              color: Colors.blue,
-              fontFamily: 'sofa',
-              fontWeight: FontWeight.w800),
+        leading: Container(
+          margin: EdgeInsets.only(left: 10),
+          child: Image.asset(
+            "assets/images/header-logo.png",
+            height: 55,
+          ),
+        ),
+        title: Container(
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.blue.shade200,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: const TextField(
+            decoration: InputDecoration(
+              hintText: "Search",
+              prefixIcon: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: FaIcon(
+                  FontAwesomeIcons.search,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+              ),
+              border: InputBorder.none,
+            ),
+          ),
         ),
         actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) {
-                return PostScreen();
-              }));
-            },
-            child: Container(
-              margin: EdgeInsets.all(5),
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.blue.shade500,
+          IconButton(
+              // Use the FaIcon Widget + FontAwesomeIcons class for the IconData
+              icon: const FaIcon(
+                FontAwesomeIcons.message,
+                size: 25,
+                color: Colors.blue,
               ),
-              child: Icon(
-                Icons.add,
-              ),
-            ),
+              onPressed: () {
+                print("Pressed");
+              }),
+          const SizedBox(
+            width: 6,
           ),
         ],
       ),
@@ -189,8 +206,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Map<String, dynamic> postData =
                             posts[index].data() as Map<String, dynamic>;
                         return Container(
-                          height: 340,
+                          height: 350,
                           margin: const EdgeInsets.all(6),
+                          padding: EdgeInsets.only(top: 8),
                           decoration: BoxDecoration(
                               color: Color.fromARGB(255, 251, 244, 244),
                               borderRadius: BorderRadius.circular(10)),

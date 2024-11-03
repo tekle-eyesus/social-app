@@ -187,7 +187,11 @@ class _PostScreenState extends State<PostScreen> {
                   const EdgeInsets.only(top: 10, bottom: 10, left: 6, right: 3),
               decoration: BoxDecoration(
                   color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(10)),
+                  border: Border.all(
+                    color: Colors.blue,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(6)),
               child: TextField(
                 maxLength: 50,
                 controller: _messageController,
@@ -198,7 +202,11 @@ class _PostScreenState extends State<PostScreen> {
             SizedBox(height: 15),
             _image != null
                 ? Container(
+                    clipBehavior: Clip.hardEdge,
                     height: 300,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                     child: Image.file(
                       _image!,
                       width: double.infinity,
@@ -243,16 +251,16 @@ class _PostScreenState extends State<PostScreen> {
               },
               child: Container(
                 padding: EdgeInsets.all(10),
-                margin: EdgeInsets.all(10),
+                margin: EdgeInsets.only(top: 10, left: 5, right: 5),
                 alignment: Alignment.center,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: Colors.blue.shade600,
-                    borderRadius: BorderRadius.circular(10)),
+                    color: Colors.blue.shade300,
+                    borderRadius: BorderRadius.circular(5)),
                 child: const Text(
-                  'Post',
+                  'POST',
                   style: TextStyle(
-                      color: Colors.black, fontFamily: 'poppins', fontSize: 20),
+                      color: Colors.white, fontFamily: 'poppins', fontSize: 20),
                 ),
               ),
             ),

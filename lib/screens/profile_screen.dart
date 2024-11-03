@@ -47,29 +47,12 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: Colors.blue.shade100,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(
-            height: 30,
-          ),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: Colors.blue.shade400,
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_outlined),
-                ),
-              ),
-            ],
+            height: 55,
           ),
           Expanded(
             child: FutureBuilder<Map<String, dynamic>?>(
@@ -143,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: AppColors.surface,
+                          color: Colors.blue.shade200,
                           boxShadow: const [
                             BoxShadow(
                               color: Color.fromARGB(255, 23, 40, 53),
@@ -255,11 +238,10 @@ class PostGridView extends StatelessWidget {
                 height: 100,
                 margin: const EdgeInsets.symmetric(
                   vertical: 4.0,
-                  horizontal: 20,
+                  horizontal: 10,
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.blueAccent,
                 ),
                 child: Stack(
                   children: [
