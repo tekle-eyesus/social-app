@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       backgroundColor: Colors.blue.shade100,
       appBar: AppBar(
-        title: Text("test Bar"),
+        backgroundColor: Colors.blue.shade100,
         actions: [
           IconButton(
             onPressed: handleSignOut,
@@ -65,9 +65,6 @@ class _ProfileScreenState extends State<ProfileScreen>
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
-            height: 55,
-          ),
           Expanded(
             child: FutureBuilder<Map<String, dynamic>?>(
               future: getUserData(),

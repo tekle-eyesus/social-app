@@ -117,6 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String usernameText(String username) {
+    return username[0].toUpperCase() + username.substring(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,11 +210,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         Map<String, dynamic> postData =
                             posts[index].data() as Map<String, dynamic>;
                         return Container(
-                          height: (postData['imageUrl'] != null) ? 350 : 150,
+                          height: (postData['imageUrl'] != null) ? 360 : 156,
                           margin: const EdgeInsets.all(6),
-                          padding: EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.only(top: 8),
                           decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 251, 244, 244),
+                              color: Color.fromARGB(97, 233, 184, 184),
                               borderRadius: BorderRadius.circular(10)),
                           child: Column(
                             children: [
@@ -218,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Container(
                                     clipBehavior: Clip.hardEdge,
-                                    margin: EdgeInsets.only(left: 5, right: 5),
+                                    margin: const EdgeInsets.only(
+                                        left: 5, right: 5),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
                                     ),
@@ -233,29 +238,44 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        postData['username'].toString(),
-                                        style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 21, 45, 81),
+                                        usernameText(
+                                            postData['username'].toString()),
+                                        style: const TextStyle(
+                                            color:
+                                                Color.fromARGB(255, 21, 45, 81),
                                             fontWeight: FontWeight.w600,
                                             fontFamily: 'poppins',
                                             fontSize: 22),
                                       ),
                                       Row(
                                         children: [
-                                          Text("UI/UX designer"),
+                                          Text((postData["profession"] != null
+                                              ? postData["profession"]
+                                                  .toString()
+                                              : "No Role")),
                                           const SizedBox(
-                                            width: 5,
+                                            width: 8,
+                                          ),
+                                          const Text(
+                                            "•",
+                                            style: TextStyle(
+                                              // fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
                                           ),
                                           Text(
                                             timeAgoFromString(
                                                     postData['timeStamp'])
                                                 .toString(),
-                                            style: TextStyle(
-                                                color: const Color.fromARGB(
+                                            style: const TextStyle(
+                                                color: Color.fromARGB(
                                                     255, 21, 45, 81),
                                                 fontWeight: FontWeight.w500),
                                           ),
@@ -312,12 +332,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   SizedBox(
                                     width: 7,
                                   ),
-                                  PostStats(icon: Icons.chat, value: "45"),
-                                  SizedBox(
-                                    width: 7,
-                                  ),
                                   PostStats(
-                                      icon: Icons.share_outlined, value: "12k"),
+                                      icon: FontAwesomeIcons.comment,
+                                      value: "45"),
                                 ],
                               )
                             ],

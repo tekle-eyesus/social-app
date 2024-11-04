@@ -82,6 +82,7 @@ class _PostScreenState extends State<PostScreen> {
         "imageUrl": imageUrl,
         "content": _messageController.text,
         "email": loggedUser.email,
+        "profession": userData["profession"],
         "username": userData['username'],
         "profile": userData['profilePic'],
         "timeStamp": DateTime.now().toIso8601String(),
