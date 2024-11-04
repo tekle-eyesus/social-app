@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Map<String, dynamic> postData =
                             posts[index].data() as Map<String, dynamic>;
                         return Container(
-                          height: 350,
+                          height: (postData['imageUrl'] != null) ? 350 : 150,
                           margin: const EdgeInsets.all(6),
                           padding: EdgeInsets.only(top: 8),
                           decoration: BoxDecoration(
@@ -276,30 +276,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  height: 200,
-                                  child: Image.network(
-                                    postData['imageUrl'],
-                                    width: double.infinity,
-                                    fit: BoxFit
-                                        .cover, // Fill the grid tile with the image
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                          child: Center(
-                                              child: CircularProgressIndicator(
-                                        color: Colors.blue.shade900,
-                                      )));
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(child: Icon(Icons.error));
-                                    },
-                                  )),
+                              if (postData["imageUrl"] != null)
+                                Container(
+                                    clipBehavior: Clip.hardEdge,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    height: 200,
+                                    child: Image.network(
+                                      postData['imageUrl'],
+                                      width: double.infinity,
+                                      fit: BoxFit
+                                          .cover, // Fill the grid tile with the image
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Center(
+                                            child: Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                          color: Colors.blue.shade900,
+                                        )));
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Center(child: Icon(Icons.error));
+                                      },
+                                    )),
                               const Row(
                                 children: [
                                   PostStats(

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/profile_post.dart';
 import 'package:socialapp/widget/profile_summery.dart';
@@ -44,10 +45,23 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
+  void handleSignOut() {
+    FirebaseAuth.instance.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue.shade100,
+      appBar: AppBar(
+        title: Text("test Bar"),
+        actions: [
+          IconButton(
+            onPressed: handleSignOut,
+            icon: FaIcon(Icons.logout),
+          ),
+        ],
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -126,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Colors.blue.shade200,
+                          color: Colors.blue.shade100,
                           boxShadow: const [
                             BoxShadow(
                               color: Color.fromARGB(255, 23, 40, 53),
@@ -241,15 +255,23 @@ class PostGridView extends StatelessWidget {
                   horizontal: 10,
                 ),
                 decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 246, 225, 164),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Stack(
                   children: [
-                    Image.network(
-                      postData["imageUrl"],
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+                    if (postData['imageUrl'] != null)
+                      Image.network(
+                        postData["imageUrl"],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    if (postData['imageUrl'] == null)
+                      Center(
+                        child: Text(
+                          postData['content'],
+                        ),
+                      ),
                     Positioned(
                       bottom: 0,
                       right: 0,

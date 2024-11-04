@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({super.key});
@@ -10,48 +11,23 @@ class UsersScreen extends StatelessWidget {
     return Scaffold(
       // backgroundColor: Theme.of(context).colorScheme.background,
       backgroundColor: Colors.blue.shade100,
-      // appBar: AppBar(
-      //   title: Text("USERS"),
-      //   // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      // ),
+      appBar: AppBar(
+        title: Text("USERS"),
+        backgroundColor: Colors.blue.shade100,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: FaIcon(
+              FontAwesomeIcons.search,
+            ),
+          ),
+          const SizedBox(
+            width: 8,
+          ),
+        ],
+      ),
       body: Column(
         children: [
-          const SizedBox(
-            height: 40,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                    margin: EdgeInsets.all(10),
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      color: Colors.blue.shade400,
-                    ),
-                    child: Icon(Icons.arrow_back_ios_outlined)),
-              ),
-              Text(
-                "U S E R S",
-                style: TextStyle(
-                    color: Colors.blue.shade900,
-                    fontSize: 20,
-                    fontFamily: 'poppins',
-                    fontWeight: FontWeight.bold),
-              ),
-              Container(
-                  padding: EdgeInsets.all(5.4),
-                  margin: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.blue.shade400,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Icon(Icons.search))
-            ],
-          ),
           Expanded(
             child: StreamBuilder(
                 stream:
@@ -74,31 +50,49 @@ class UsersScreen extends StatelessWidget {
                         //single user data as a map
                         Map<String, dynamic> userData =
                             users[index].data() as Map<String, dynamic>;
-                        return Container(
-                          margin: EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                              color: Colors.blue.shade200,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(color: Colors.blue.shade600)),
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 2,
+                          ),
                           child: ListTile(
                             trailing: IconButton(
                                 onPressed: () {},
-                                icon: Icon(
-                                  Icons.message,
+                                icon: FaIcon(
+                                  FontAwesomeIcons.message,
                                   color: Colors.lightBlue.shade900,
                                   size: 27,
                                 )),
-                            leading: const Icon(Icons.person),
+                            leading: Container(
+                              clipBehavior: Clip.hardEdge,
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blue,
+                                    offset: Offset(4, 2),
+                                    blurRadius: 10,
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Image.network(
+                                userData["profilePic"],
+                                fit: BoxFit.cover,
+                                height: 50,
+                              ),
+                            ),
                             title: Text(
                               userData['username'],
                               style: const TextStyle(
                                 fontFamily: 'poppins',
+                                fontSize: 20,
+                                color: Color.fromARGB(255, 8, 70, 121),
                               ),
                             ),
                             subtitle: Text(
                               userData['email'],
                               style: const TextStyle(
-                                fontStyle: FontStyle.italic,
+                                fontStyle: FontStyle.normal,
                               ),
                             ),
                           ),

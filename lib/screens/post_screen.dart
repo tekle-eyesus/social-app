@@ -61,7 +61,7 @@ class _PostScreenState extends State<PostScreen> {
       showDialog(
           context: context,
           builder: (context) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(
                 color: Colors.amber,
               ),
@@ -78,8 +78,6 @@ class _PostScreenState extends State<PostScreen> {
         onError: (e) => print("Error getting document: $e"),
       );
 
-//what about
-      print("from below the userata ${_messageController.text}");
       await db.collection("posts").doc().set({
         "imageUrl": imageUrl,
         "content": _messageController.text,
@@ -92,10 +90,10 @@ class _PostScreenState extends State<PostScreen> {
       _messageController.clear();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         width: 200,
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         content: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(bottom: 70),
+          margin: const EdgeInsets.only(bottom: 50),
           height: 44,
           decoration: BoxDecoration(
               color: Colors.deepPurple.shade200,
@@ -113,14 +111,15 @@ class _PostScreenState extends State<PostScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         width: 200,
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         content: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(bottom: 70),
+          margin: const EdgeInsets.only(bottom: 50),
           height: 44,
           decoration: BoxDecoration(
-              color: Colors.deepPurple.shade200,
-              borderRadius: BorderRadius.circular(12)),
+            color: Colors.deepPurple.shade200,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Text(
             "Say something!!",
             style: TextStyle(
@@ -141,8 +140,8 @@ class _PostScreenState extends State<PostScreen> {
       imageUrl = await uploadImage(image);
     }
 
-    print(imageUrl);
-    print(message);
+    // print(imageUrl);
+    // print(message);
 
     handlePost(imageUrl);
 
@@ -159,21 +158,10 @@ class _PostScreenState extends State<PostScreen> {
     return Scaffold(
       backgroundColor: Colors.blue.shade100,
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return HomeScreen();
-              }));
-            },
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.blue.shade900,
-            )),
         backgroundColor: Colors.blue.shade100,
         title: const Text(
           'Create Post',
           style: TextStyle(
-            fontFamily: 'poppins',
             fontSize: 20,
           ),
         ),
@@ -227,9 +215,16 @@ class _PostScreenState extends State<PostScreen> {
               children: [
                 ElevatedButton(
                   style: ButtonStyle(
-                      iconColor: MaterialStatePropertyAll(Colors.amber),
-                      backgroundColor:
-                          MaterialStatePropertyAll(Colors.blue.shade400)),
+                    padding: const MaterialStatePropertyAll(
+                      EdgeInsets.symmetric(
+                        horizontal: 45,
+                      ),
+                    ),
+                    iconColor: const MaterialStatePropertyAll(Colors.amber),
+                    backgroundColor: MaterialStatePropertyAll(
+                      Color.fromARGB(255, 151, 236, 14),
+                    ),
+                  ),
                   onPressed: pickImage,
                   child: Text(
                     'Pick Image',
@@ -241,9 +236,9 @@ class _PostScreenState extends State<PostScreen> {
             GestureDetector(
               onTap: () async {
                 await createPost(_messageController.text, _image);
-                print(_messageController.text);
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Post Created!')));
+
+                // ScaffoldMessenger.of(context)
+                //     .showSnackBar(SnackBar(content: Text('Post Created!')));
                 // _messageController.clear();
                 setState(() {
                   _image = null;
