@@ -32,7 +32,7 @@ class _TabScreenState extends State<TabScreen> {
       bottomNavigationBar: CurvedNavigationBar(
         index: index,
         height: 55,
-        color: const Color.fromARGB(255, 17, 77, 180),
+        color: Colors.blue.shade400,
         backgroundColor: Colors.transparent,
         buttonBackgroundColor: const Color.fromARGB(255, 6, 16, 88),
         animationDuration: const Duration(milliseconds: 300),

@@ -81,7 +81,7 @@ class _PostScreenState extends State<PostScreen> {
       await db.collection("posts").doc().set({
         "imageUrl": imageUrl,
         "content": _messageController.text,
-        "email": loggedUser.email,
+        "email": loggedUser.email, // acts as user id
         "profession": userData["profession"],
         "username": userData['username'],
         "profile": userData['profilePic'],

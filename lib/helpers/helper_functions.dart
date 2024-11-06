@@ -106,3 +106,23 @@ Future<Map<String, dynamic>?> fetchCurrentUserInfo() async {
     return null;
   }
 }
+
+// fetch the user data by userId (user email)
+Future<Map<String, dynamic>?> fetchUserDataById(String userId) async {
+  try {
+    // Access the Firestore instance
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    // Check if the document exists and return its data
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>?;
+    } else {
+      print("User not found in the database.");
+      return null;
+    }
+  } catch (e) {
+    print("Error fetching user data: $e");
+    return null;
+  }
+}

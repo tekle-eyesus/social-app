@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 
+Future<String> getImageUrl(String userId) async {
+  Map<String, dynamic>? userData = await fetchUserDataById(userId);
+  return "";
+}
+
 void showCommentsBottomSheet(
     BuildContext context, String postId, String currentUsername) {
   showModalBottomSheet(
@@ -23,7 +28,7 @@ void showCommentsBottomSheet(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Header
-              Padding(
+              const Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   'Comments',
@@ -50,8 +55,27 @@ void showCommentsBottomSheet(
                       itemBuilder: (context, index) {
                         final comment =
                             comments[index].data() as Map<String, dynamic>;
+
                         return ListTile(
-                          title: Text(comment['username']),
+                          title: Text(
+                            comment['username'],
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                          leading: Container(
+                            clipBehavior: Clip.hardEdge,
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Image.network(
+                              comment['profilePic'],
+                              height: 30,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                           subtitle: Text(comment['commentText']),
                           trailing: Text(
                             timeAgoFromString(comment['timestamp'].toString()),
@@ -83,6 +107,10 @@ void showCommentsBottomSheet(
                       icon: Icon(Icons.send),
                       onPressed: () async {
                         if (commentController.text.trim().isNotEmpty) {
+                          Map<String, dynamic>? userData =
+                              await fetchUserDataById(FirebaseAuth
+                                  .instance.currentUser!.email
+                                  .toString());
                           await FirebaseFirestore.instance
                               .collection('posts')
                               .doc(postId)
@@ -90,6 +118,7 @@ void showCommentsBottomSheet(
                               .add({
                             'userId': FirebaseAuth.instance.currentUser!.email,
                             'username': currentUsername,
+                            'profilePic': userData!['profilePic'],
                             'commentText': commentController.text.trim(),
                             'timestamp': DateTime.now().toIso8601String(),
                           });
