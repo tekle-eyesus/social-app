@@ -1,21 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
-import 'package:socialapp/screens/post_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
-import 'package:socialapp/widget/custom_drawer.dart';
-import 'package:socialapp/widget/custom_textfield.dart';
-import 'package:socialapp/widget/post_btn.dart';
+import 'package:socialapp/widget/comment_sheet.dart';
 import 'package:socialapp/widget/post_stats.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -47,10 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
       postMessageController.clear();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         width: 200,
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
         content: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(bottom: 70),
+          margin: const EdgeInsets.only(bottom: 70),
           height: 44,
           decoration: BoxDecoration(
               color: Colors.deepPurple.shade200,
@@ -89,36 +82,64 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  String timeAgoFromString(String timestampString) {
-    try {
-      // Parse the timestamp string to DateTime
-      DateTime postDate = DateTime.parse(timestampString);
-      Duration difference = DateTime.now().difference(postDate);
+  // LIKE IMPLEMENTATION
 
-      if (difference.inSeconds < 60) {
-        return "${difference.inSeconds}s ago";
-      } else if (difference.inMinutes < 60) {
-        return "${difference.inMinutes} min ago";
-      } else if (difference.inHours < 24) {
-        return "${difference.inHours} hr ago";
-      } else if (difference.inDays < 7) {
-        return "${difference.inDays} days ago";
-      } else if (difference.inDays < 30) {
-        return "${(difference.inDays / 7).floor()} week(s) ago";
-      } else if (difference.inDays < 365) {
-        return "${(difference.inDays / 30).floor()} month(s) ago";
-      } else {
-        return "${(difference.inDays / 365).floor()} year(s) ago";
-      }
-    } catch (e) {
-      // Handle any parsing errors or invalid timestamp format
-      print("Error parsing timestamp: $e");
-      return "Invalid date";
+  Future<void> likePost(String postId, String userId) async {
+    final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
+
+    // Check if the user already liked the post
+    DocumentSnapshot postSnapshot = await postRef.get();
+    List likedBy = postSnapshot['likedBy'] ?? [];
+
+    if (likedBy.contains(userId)) {
+      // Unlike the post
+      await postRef.update({
+        'likedBy': FieldValue.arrayRemove([userId]),
+        'likesCount': FieldValue.increment(-1),
+      });
+    } else {
+      // Like the post
+      await postRef.update({
+        'likedBy': FieldValue.arrayUnion([userId]),
+        'likesCount': FieldValue.increment(1),
+      });
     }
+  }
+
+  /// COMMENT IMPLEMENTATION
+  Future<void> addComment(
+      String postId, String userId, String username, String commentText) async {
+    final commentRef = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .doc();
+
+    await commentRef.set({
+      'userId': userId,
+      'username': username,
+      'commentText': commentText,
+      'timestamp':
+          FieldValue.serverTimestamp(), // Automatically sets the server time.
+    });
   }
 
   String usernameText(String username) {
     return username[0].toUpperCase() + username.substring(1);
+  }
+
+  Future<Map<String, dynamic>?> getUserInfo() async {
+    // Fetch user information using the helper function
+    Map<String, dynamic>? userInfo = await fetchCurrentUserInfo();
+
+    if (userInfo != null) {
+      // If user info is found, return it
+      return userInfo;
+    } else {
+      // Return null if user is not found or not logged in
+      print("User not found or not logged in.");
+      return null;
+    }
   }
 
   @override
@@ -209,6 +230,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: ((context, index) {
                         Map<String, dynamic> postData =
                             posts[index].data() as Map<String, dynamic>;
+                        print(postData);
+////////////////////////////////////////////////
+                        final post = snapshot.data!;
+                        final likeCount = postData['likesCount'] ?? 0;
+                        final commentCount = postData['commentsCount'] ?? 0;
+                        final likedBy = List.from(postData['likedBy'] ?? []);
+                        final userLiked = likedBy
+                            .contains(FirebaseAuth.instance.currentUser!.email);
                         return Container(
                           height: (postData['imageUrl'] != null) ? 360 : 156,
                           margin: const EdgeInsets.all(6),
@@ -324,17 +353,44 @@ class _HomeScreenState extends State<HomeScreen> {
                                         return Center(child: Icon(Icons.error));
                                       },
                                     )),
-                              const Row(
+                              Row(
                                 children: [
-                                  PostStats(
-                                      icon: Icons.favorite_border,
-                                      value: "123"),
-                                  SizedBox(
-                                    width: 7,
+                                  IconButton(
+                                    icon: Icon(
+                                      userLiked
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color:
+                                          userLiked ? Colors.red : Colors.grey,
+                                    ),
+                                    onPressed: () async {
+                                      Map<String, dynamic>? userInfo =
+                                          await getUserInfo();
+                                      likePost(
+                                          snapshot.data!.docs[index].id,
+                                          userInfo![
+                                              'email']); // Pass current post ID and user ID.
+                                    },
                                   ),
-                                  PostStats(
-                                      icon: FontAwesomeIcons.comment,
-                                      value: "45"),
+                                  Text('$likeCount likes'),
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      Map<String, dynamic>? userInfo =
+                                          await getUserInfo();
+                                      // print(userInfo!['username']);
+                                      showCommentsBottomSheet(
+                                          context,
+                                          snapshot.data!.docs[index].id,
+                                          userInfo!['username'].toString());
+                                    },
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.comment,
+                                    ),
+                                  ),
+                                  Text('$commentCount comments')
                                 ],
                               )
                             ],

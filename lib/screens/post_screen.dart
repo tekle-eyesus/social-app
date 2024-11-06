@@ -85,6 +85,9 @@ class _PostScreenState extends State<PostScreen> {
         "profession": userData["profession"],
         "username": userData['username'],
         "profile": userData['profilePic'],
+        "likesCount": 0,
+        "commentsCount": 0,
+        "likedBy": [],
         "timeStamp": DateTime.now().toIso8601String(),
       });
       Navigator.pop(context);
