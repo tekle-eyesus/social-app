@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/screens/user_profile_screen.dart';
+import 'package:socialapp/screens/users_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/comment_sheet.dart';
 import 'package:socialapp/widget/post_stats.dart';
@@ -150,12 +152,12 @@ class _HomeScreenState extends State<HomeScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              stretchTriggerOffset: 10,
               floating: true,
               snap: true,
               centerTitle: true,
-              toolbarHeight: 65,
+
               leadingWidth: 45,
+
               foregroundColor: AppColors.primaryText,
               backgroundColor: AppColors.surface,
               // elevation: 0,
@@ -169,18 +171,21 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Container(
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade200,
+                  gradient: LinearGradient(
+                      colors: [Colors.blue.shade300, Colors.blue.shade100]),
                   borderRadius: BorderRadius.circular(40),
                 ),
                 child: const TextField(
                   decoration: InputDecoration(
-                    hintText: "Search",
+                    hintText: "Search...",
+                    contentPadding: EdgeInsets.all(3),
                     prefixIcon: Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                       child: FaIcon(
                         FontAwesomeIcons.search,
                         size: 20,
-                        color: Colors.grey,
+                        color: Color.fromARGB(255, 240, 236, 236),
                       ),
                     ),
                     border: InputBorder.none,
@@ -235,6 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     List<DocumentSnapshot> posts = snapshot.data!.docs;
 
                     return ListView.builder(
+                        padding: const EdgeInsets.only(top: 8, bottom: 67),
                         itemCount: posts.length,
                         itemBuilder: ((context, index) {
                           Map<String, dynamic> postData =
@@ -256,6 +262,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               children: [
                                 ListTile(
+                                  onTap: () {
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) {
+                                      return UserProfileScreen(
+                                        userEmail: postData['email'],
+                                      );
+                                    }));
+                                  },
                                   contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 4),
                                   leading: Container(
@@ -263,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     margin: const EdgeInsets.only(
                                         left: 5, right: 5),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
+                                      borderRadius: BorderRadius.circular(15),
                                     ),
                                     child: Image.network(
                                       postData['profile'],
@@ -326,18 +340,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.all(10),
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 6, horizontal: 20),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     postData['content'].toString(),
                                     style: const TextStyle(
                                       color: Color.fromARGB(255, 3, 16, 35),
-                                      fontFamily: 'sofa',
+                                      fontFamily: 'roboto',
                                     ),
                                   ),
                                 ),
                                 if (postData["imageUrl"] != null)
                                   Container(
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 10),
                                       clipBehavior: Clip.hardEdge,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
@@ -385,7 +402,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 'email']); // Pass current post ID and user ID.
                                       },
                                     ),
-                                    Text('$likeCount likes'),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2, horizontal: 3),
+                                      decoration: const BoxDecoration(
+                                          color: Color.fromARGB(97, 0, 0, 0),
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(1),
+                                              bottomLeft: Radius.circular(7),
+                                              topRight: Radius.circular(10),
+                                              bottomRight: Radius.circular(7))),
+                                      child: Text(
+                                        '$likeCount likes',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
                                     const SizedBox(
                                       width: 15,
                                     ),
@@ -399,11 +432,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                             snapshot.data!.docs[index].id,
                                             userInfo!['username'].toString());
                                       },
-                                      icon: FaIcon(
+                                      icon: const FaIcon(
                                         FontAwesomeIcons.comment,
                                       ),
                                     ),
-                                    Text('$commentCount comments')
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2, horizontal: 3),
+                                      decoration: const BoxDecoration(
+                                          color: Color.fromARGB(97, 0, 0, 0),
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(1),
+                                              bottomLeft: Radius.circular(7),
+                                              topRight: Radius.circular(10),
+                                              bottomRight: Radius.circular(7))),
+                                      child: Text(
+                                        '$commentCount comments',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 )
                               ],

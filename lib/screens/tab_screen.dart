@@ -50,7 +50,7 @@ class _TabScreenState extends State<TabScreen> {
           FaIcon(
             FontAwesomeIcons.add,
             size: 26,
-            color: Color.fromARGB(255, 141, 244, 6),
+            color: Color.fromARGB(255, 95, 3, 165),
           ),
           FaIcon(
             FontAwesomeIcons.solidBell,
