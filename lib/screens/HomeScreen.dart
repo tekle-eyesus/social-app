@@ -156,17 +156,21 @@ class _HomeScreenState extends State<HomeScreen> {
               snap: true,
               centerTitle: true,
 
-              leadingWidth: 45,
+              leadingWidth: 46,
 
               foregroundColor: AppColors.primaryText,
               backgroundColor: AppColors.surface,
               // elevation: 0,
-              leading: Container(
-                margin: EdgeInsets.only(left: 10),
-                child: Image.asset(
-                  "assets/images/header-logo.png",
-                  height: 55,
-                ),
+              leading: Row(
+                children: [
+                  const SizedBox(
+                    width: 6,
+                  ),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUyllrW-u-01_B8qMki4ybHzbhuBWhUq3pMA&s"),
+                  ),
+                ],
               ),
               title: Container(
                 height: 40,
@@ -267,6 +271,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         MaterialPageRoute(builder: (context) {
                                       return UserProfileScreen(
                                         userEmail: postData['email'],
+                                        username: postData['username'],
+                                        receiverImageUrl: postData['profile'],
                                       );
                                     }));
                                   },

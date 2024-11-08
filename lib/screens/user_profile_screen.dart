@@ -9,13 +9,25 @@ import 'package:socialapp/widget/comment_sheet.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userEmail;
-  const UserProfileScreen({super.key, required this.userEmail});
+  final String username;
+  final String receiverImageUrl;
+  const UserProfileScreen(
+      {super.key,
+      required this.userEmail,
+      required this.username,
+      required this.receiverImageUrl});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  String getChatRoomId(String user1Id, String user2Id) {
+    return user1Id.compareTo(user2Id) < 0
+        ? '$user1Id\_$user2Id'
+        : '$user2Id\_$user1Id';
+  }
+
   Future<Map<String, dynamic>?> getUserInfo() async {
     // Fetch user information using the helper function
     Map<String, dynamic>? userInfo = await fetchCurrentUserInfo();
@@ -60,7 +72,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             onPressed: () {
               // chat screen
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const ChatScreen();
+                return ChatScreen(
+                    receiverId: widget.userEmail,
+                    receiverName: widget.username,
+                    receiverImageUrl: widget.receiverImageUrl);
               }));
             },
             icon: const FaIcon(
@@ -85,6 +100,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ),
         child: FutureBuilder<Map<String, dynamic>?>(
+          // not important for now
           future: getUserInfo(),
           builder: (context, userInfoSnapshot) {
             if (userInfoSnapshot.connectionState == ConnectionState.waiting) {
@@ -113,7 +129,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   return const Center(child: Text("No Posts for this user!"));
                 } else if (snapshot.hasData) {
                   List<DocumentSnapshot> posts = snapshot.data!.docs;
-
+                  print(posts);
+                  Map<String, dynamic> post =
+                      posts[0].data() as Map<String, dynamic>;
+                  final postUser = post['username'];
+                  final postUserProfession = post['profession'];
+                  final postUserImg = post['profile'];
                   // Display metadata and posts together
                   return ListView(
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -131,7 +152,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               borderRadius: BorderRadius.circular(18),
                             ),
                             child: Image.network(
-                              userInfo?['profile'] ??
+                              postUserImg ??
                                   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-YIGV8GTRHiW_KACLMhhi9fEq2T5BDQcEyA&s",
                               fit: BoxFit.cover,
                             ),
@@ -155,8 +176,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         .min, // Minimizes the vertical space
                                     children: [
                                       Text(
-                                        usernameText(
-                                            userInfo?['username'] ?? ""),
+                                        usernameText(postUser ?? ""),
                                         style: const TextStyle(
                                           fontFamily: 'teko',
                                           fontSize: 40,
@@ -164,7 +184,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ),
                                       // / Adjust this value to control the spacing
                                       Text(
-                                        userInfo?['profession'] ??
+                                        postUserProfession ??
                                             "Profession not set",
                                         style: const TextStyle(
                                           fontSize: 22,
