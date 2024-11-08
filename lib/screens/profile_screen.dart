@@ -123,38 +123,100 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ],
                       ),
                       const SizedBox(
+                        height: 5,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.solidHeart,
+                            color: Colors.red,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "13",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 22,
+                              fontFamily: 'teko',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            "•",
+                            style: TextStyle(
+                              fontFamily: 'poppins',
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          FaIcon(
+                            FontAwesomeIcons.solidStar,
+                            color: Color.fromARGB(255, 190, 172, 1),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "100",
+                            style: TextStyle(
+                              color: Colors.purple,
+                              fontSize: 22,
+                              fontFamily: 'teko',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.blue.shade100,
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color.fromARGB(255, 23, 40, 53),
-                              offset: Offset(0.2, 0.1),
-                              blurRadius: 1,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(73, 0, 0, 0),
+                              borderRadius: BorderRadius.circular(5),
                             ),
-                          ],
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ProfileSummery(title: "Posts", amount: 12),
-                            ProfileSummery(title: "Likes", amount: 23),
-                            ProfileSummery(title: "Followers", amount: 8),
-                          ],
-                        ),
+                            child: Text(
+                              "Edit Profile",
+                              style: TextStyle(
+                                color: Colors.blue.shade100,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(73, 0, 0, 0),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              "Share Profile",
+                              style: TextStyle(
+                                color: Colors.blue.shade100,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+
                       const SizedBox(height: 20),
 
                       // TabBar Section (Posts and Favorites)
@@ -235,59 +297,83 @@ class PostGridView extends StatelessWidget {
         } else if (snapshot.hasData) {
           List<DocumentSnapshot> posts = snapshot.data!.docs;
 
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1, // 3 columns for posts
-              childAspectRatio: 9 / 5, // Aspect ratio for posts
-            ),
+          return ListView.builder(
             itemCount: posts.length, // Number of posts
             itemBuilder: (context, index) {
               Map<String, dynamic> postData =
                   posts[index].data() as Map<String, dynamic>;
               return Container(
                 clipBehavior: Clip.hardEdge,
-                height: 100,
+                // height: (postData['imageUrl'] != null) ? 50 : 100,
+
                 margin: const EdgeInsets.symmetric(
                   vertical: 4.0,
                   horizontal: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 246, 225, 164),
+                  color: Color.fromARGB(69, 0, 3, 3),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Stack(
+                child: Column(
                   children: [
+                    //content
+
                     if (postData['imageUrl'] != null)
-                      Image.network(
-                        postData["imageUrl"],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
-                    if (postData['imageUrl'] == null)
-                      Center(
-                        child: Text(
-                          postData['content'],
+                      Container(
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Image.network(
+                          "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_640.jpg",
+                          fit: BoxFit.cover,
+                          height: 200,
+                          width: double.infinity,
                         ),
                       ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      left: 0,
-                      child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: const BoxDecoration(
-                            color: Colors.black54,
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          postData['content'],
+                          style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            // fontFamily: 'roboto',
+                            fontSize: 17,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              ProfileMetaData(
-                                  icon: Icons.favorite_border, content: '2k'),
-                              ProfileMetaData(icon: Icons.share, content: '55'),
-                              ProfileMetaData(
-                                  icon: Icons.message_outlined, content: '25k'),
-                            ],
-                          )),
+                        ),
+                      ],
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.favorite_border_outlined,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            postData['likesCount'].toString(),
+                            style: TextStyle(
+                              color: Colors.purple,
+                              fontSize: 17,
+                              fontFamily: 'teko',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),

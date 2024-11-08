@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/screens/chat_screen.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({super.key});
@@ -57,7 +58,16 @@ class UsersScreen extends StatelessWidget {
                           ),
                           child: ListTile(
                             trailing: IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: ((context) {
+                                    return ChatScreen(
+                                        receiverId: userData['email'],
+                                        receiverName: userData['username'],
+                                        receiverImageUrl:
+                                            userData['profilePic']);
+                                  })));
+                                },
                                 icon: FaIcon(
                                   FontAwesomeIcons.message,
                                   color: Colors.lightBlue.shade900,
@@ -90,7 +100,7 @@ class UsersScreen extends StatelessWidget {
                               ),
                             ),
                             subtitle: Text(
-                              userData['email'],
+                              userData['profession'] ?? "unknown",
                               style: const TextStyle(
                                 fontStyle: FontStyle.normal,
                               ),

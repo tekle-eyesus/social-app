@@ -54,6 +54,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Theme.of(context).colorScheme.background,
@@ -92,85 +99,88 @@ class _LoginScreenState extends State<LoginScreen>
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.all(25),
+            height: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(100 * _animationController.value),
               ),
               color: Colors.blue.shade100,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Image.asset(
-                  "assets/images/illu1.png",
-                  height: 150,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                CustomTextfield(
-                    hintText: "Email Address",
-                    obscureText: false,
-                    controller: emailController),
-                const SizedBox(
-                  height: 10,
-                ),
-                CustomTextfield(
-                    hintText: "password",
-                    obscureText: true,
-                    controller: passwordController),
-                const SizedBox(
-                  height: 25,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 39,
-                ),
-                MyButton(
-                  text: "Login",
-                  onTap: handleLogIn,
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Already have an account?",
-                      style: TextStyle(
-                          // color: Theme.of(context).colorScheme.inversePrimary,
-                          fontFamily: 'poppins'),
-                    ),
-                    const SizedBox(
-                      width: 3,
-                    ),
-                    GestureDetector(
-                      onTap: widget.onTap,
-                      child: const Text(
-                        "Register Here",
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Image.asset(
+                    "assets/images/illu1.png",
+                    height: 150,
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  CustomTextfield(
+                      hintText: "Email Address",
+                      obscureText: false,
+                      controller: emailController),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  CustomTextfield(
+                      hintText: "password",
+                      obscureText: true,
+                      controller: passwordController),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Forgot Password?",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'poppins',
-                            color: Color.fromARGB(255, 1, 95, 173)),
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
                       ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 39,
+                  ),
+                  MyButton(
+                    text: "Login",
+                    onTap: handleLogIn,
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already have an account?",
+                        style: TextStyle(
+                            // color: Theme.of(context).colorScheme.inversePrimary,
+                            fontFamily: 'poppins'),
+                      ),
+                      const SizedBox(
+                        width: 3,
+                      ),
+                      GestureDetector(
+                        onTap: widget.onTap,
+                        child: const Text(
+                          "Register Here",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'poppins',
+                              color: Color.fromARGB(255, 1, 95, 173)),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
+              ),
             ),
           );
         },
