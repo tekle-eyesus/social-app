@@ -12,11 +12,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
 
   void handleLogIn() async {
@@ -28,7 +25,9 @@ class _LoginScreenState extends State<LoginScreen>
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
+        email: emailController.text,
+        password: passwordController.text,
+      );
       if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
@@ -40,68 +39,52 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      lowerBound: 0,
-      upperBound: 1,
-      duration: const Duration(
-        milliseconds: 900,
-      ),
-    );
-    _animationController.forward();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Theme.of(context).colorScheme.background,
-      backgroundColor: Color.fromARGB(255, 6, 16, 88),
-      appBar: AppBar(
-        title: Text("VibeHub",
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Color.fromARGB(255, 6, 16, 88),
-                  fontFamily: 'poppins',
-                  fontSize: 36,
-                )),
-        toolbarHeight: 100,
-        titleSpacing: 7,
-        backgroundColor: Colors.blue.shade500,
-        bottom: PreferredSize(
-            preferredSize: Size(double.infinity, 50),
-            child: Container(
-              width: double.infinity,
-              height: 70,
-              color: Color.fromARGB(255, 6, 16, 88),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                child: Text("CONNECT",
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Colors.white,
-                          fontFamily: 'sofa',
-                          fontSize: 20,
-                        )),
-              ),
-            )),
-      ),
-      body: AnimatedBuilder(
-        animation: _animationController,
-        builder: (context, child) {
-          return Container(
+        // backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Color.fromARGB(255, 6, 16, 88),
+        appBar: AppBar(
+          title: Text("VibeHub",
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Color.fromARGB(255, 6, 16, 88),
+                    fontFamily: 'poppins',
+                    fontSize: 36,
+                  )),
+          toolbarHeight: 100,
+          titleSpacing: 7,
+          backgroundColor: Colors.blue.shade500,
+          bottom: PreferredSize(
+              preferredSize: Size(double.infinity, 50),
+              child: Container(
+                width: double.infinity,
+                height: 70,
+                color: Color.fromARGB(255, 6, 16, 88),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: Text("CONNECT",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Colors.white,
+                            fontFamily: 'sofa',
+                            fontSize: 20,
+                          )),
+                ),
+              )),
+        ),
+        body: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(25),
             height: double.infinity,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(100 * _animationController.value),
-              ),
               color: Colors.blue.shade100,
             ),
             child: SingleChildScrollView(
@@ -179,10 +162,8 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      ),
-    );
+            )));
+
+    ///main thing
   }
 }
