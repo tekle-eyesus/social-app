@@ -40,11 +40,11 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           ),
           borderRadius: BorderRadius.circular(12),
         ),
-        suffixIcon: widget.hintText.contains("Password")
+        suffixIcon: widget.hintText.toLowerCase().contains("password")
             ? IconButton(
                 onPressed: _toggleObscureText,
-                icon: const Icon(
-                  Icons.visibility_off,
+                icon: Icon(
+                  widget.obscureText ? Icons.visibility_off : Icons.visibility,
                   color: Colors.grey,
                 ),
               )
