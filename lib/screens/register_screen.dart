@@ -92,6 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
@@ -108,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               const SizedBox(height: 6),
 
-              Text(
+              const Text(
                 "Join the vibe and start connecting 🚀",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -118,14 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
-
-              Image.asset(
-                "assets/images/illu3.png",
-                height: 150,
-              ),
-
-              const SizedBox(height: 32),
+              const SizedBox(height: 70),
 
               CustomTextfield(
                 hintText: "Username",
@@ -150,18 +144,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: selectedProfession,
-                    hint: Text(
+                    hint: const Text(
                       "Select profession",
                       style: TextStyle(
                         fontFamily: 'poppins',
@@ -208,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 28),
 
               SizedBox(
-                height: 52,
+                height: 60,
                 child: MyButton(
                   text: "Create Account",
                   onTap: handleRegister,
@@ -221,22 +209,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Already have an account?",
                     style: TextStyle(
                       fontFamily: 'poppins',
-                      color: const Color(0xFF6B7280),
+                      color: Color(0xFF6B7280),
                     ),
                   ),
                   const SizedBox(width: 6),
                   GestureDetector(
                     onTap: widget.onTap,
-                    child: Text(
+                    child: const Text(
                       "Login",
                       style: TextStyle(
                         fontFamily: 'poppins',
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF4F6BED),
+                        color: Color(0xFF4F6BED),
                       ),
                     ),
                   ),
@@ -245,24 +233,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               const SizedBox(height: 32),
 
-              // Divider
+              // social login options
               Row(
-                children: const [
-                  Expanded(child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("or sign up with"),
+                children: [
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey.withOpacity(0.3),
+                      thickness: 1,
+                    ),
                   ),
-                  Expanded(child: Divider()),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      "Or continue with",
+                      style: TextStyle(
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey.withOpacity(0.3),
+                      thickness: 1,
+                    ),
+                  ),
                 ],
               ),
 
-              const SizedBox(height: 20),
-
+              const SizedBox(height: 40),
               // Social buttons
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   AuthComponenet(
                     icon: FontAwesomeIcons.google,
                     iconColor: Color(0xFFDB4437),
