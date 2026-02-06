@@ -6,7 +6,7 @@ import 'package:socialapp/widget/my_button.dart';
 
 class LoginScreen extends StatefulWidget {
   final void Function()? onTap;
-  LoginScreen({super.key, required this.onTap});
+  const LoginScreen({super.key, required this.onTap});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -43,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -64,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 "VibeHub",
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                      fontFamily: 'poppins',
+                      fontFamily: 'bebas',
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF1F2937),
                     ),
@@ -72,13 +73,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 6),
 
-              Text(
+              const Text(
                 "Connect. Share. Feel the vibe ✨",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFF6B7280),
                   fontSize: 14,
-                  fontFamily: 'poppins',
+                  fontFamily: 'bebas',
                 ),
               ),
 
@@ -144,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     "Don’t have an account?",
                     style: TextStyle(
                       fontFamily: 'poppins',
-                      color: const Color(0xFF6B7280),
+                      color: Color(0xFF6B7280),
                     ),
                   ),
                   const SizedBox(width: 6),
