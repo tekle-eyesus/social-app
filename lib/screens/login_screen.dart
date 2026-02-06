@@ -134,13 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 40),
 
               // Register
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Don’t have an account?",
                     style: TextStyle(
                       fontFamily: 'poppins',
@@ -150,12 +150,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(width: 6),
                   GestureDetector(
                     onTap: widget.onTap,
-                    child: Text(
+                    child: const Text(
                       "Register",
                       style: TextStyle(
                         fontFamily: 'poppins',
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF4F6BED),
+                        fontWeight: FontWeight.w300,
+                        color: Color.fromARGB(199, 79, 108, 237),
                       ),
                     ),
                   ),
@@ -163,6 +163,55 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
 
               const SizedBox(height: 40),
+
+              // social login options
+              Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey.withOpacity(0.3),
+                      thickness: 1,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      "Or continue with",
+                      style: TextStyle(
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey.withOpacity(0.3),
+                      thickness: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Google
+                  Icon(
+                    Icons.g_mobiledata,
+                    size: 50,
+                    color: Colors.red,
+                  ),
+                  SizedBox(width: 24),
+                  // Apple
+                  Icon(Icons.apple, size: 40),
+                  SizedBox(width: 24),
+                  // Facebook
+                  Icon(
+                    Icons.facebook,
+                    size: 40,
+                    color: Colors.blue,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
