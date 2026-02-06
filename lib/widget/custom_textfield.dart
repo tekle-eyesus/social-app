@@ -16,10 +16,23 @@ class CustomTextfield extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
-          hintText: hintText,
-          border: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(12))),
+        hintText: hintText,
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.black.withOpacity(0.6),
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.black.withOpacity(0.2),
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 }
