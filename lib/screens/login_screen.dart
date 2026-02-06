@@ -18,22 +18,18 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  bool _isLoading = false;
   void handleLogIn() async {
-    showDialog(
-        context: context,
-        builder: (context) => (const Center(
-              child: CircularProgressIndicator(),
-            )));
+    setState(() => _isLoading = true);
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
-      if (mounted) Navigator.pop(context);
+      if (mounted) setState(() => _isLoading = false);
     } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
+      setState(() => _isLoading = false);
       // DisplayErrorMessage(e.code, context);
       showCustomSnackbar(context, e.code);
     }
@@ -135,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       builder: (context) => const ForgotPasswordSheet(),
                     );
                   },
-                  child: Text(
+                  child: const Text(
                     "Forgot password?",
                     style: TextStyle(
                       fontSize: 16,
@@ -154,6 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: MyButton(
                   text: "Login",
                   onTap: handleLogIn,
+                  isLoading: _isLoading,
                 ),
               ),
 
