@@ -108,17 +108,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: passwordController,
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 15),
 
               // Forgot password
-              Align(
+              const Align(
                 alignment: Alignment.centerRight,
                 child: Text(
                   "Forgot password?",
                   style: TextStyle(
-                    fontSize: 13,
-                    color: const Color(0xFF4F6BED),
-                    fontFamily: 'poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
+                    color: Color.fromARGB(199, 79, 108, 237),
                   ),
                 ),
               ),
