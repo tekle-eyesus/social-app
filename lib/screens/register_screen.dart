@@ -93,7 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 32),
 
@@ -103,6 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                       fontFamily: 'poppins',
                       fontWeight: FontWeight.bold,
+                      fontSize: 32,
                       color: const Color(0xFF1F2937),
                     ),
               ),
@@ -110,13 +111,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 6),
 
               const Text(
-                "Join the vibe and start connecting 🚀",
-                textAlign: TextAlign.center,
+                "Connect with fellow developers, designers,\nand tech leaders worldwide.",
                 style: TextStyle(
-                  fontFamily: 'poppins',
-                  color: const Color(0xFF6B7280),
-                  fontSize: 14,
-                ),
+                    color: Color(0xFF6B7280),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500),
               ),
 
               const SizedBox(height: 70),

@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
 
@@ -69,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                       fontFamily: 'bebas',
                       fontWeight: FontWeight.bold,
+                      fontSize: 40,
                       color: const Color(0xFF1F2937),
                     ),
               ),
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFF6B7280),
-                  fontSize: 14,
+                  fontSize: 20,
                   fontFamily: 'bebas',
                 ),
               ),
@@ -88,9 +89,14 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
 
               // Illustration
-              Image.asset(
-                "assets/images/illu1.png",
-                height: 160,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/illu1.png",
+                    height: 160,
+                  ),
+                ],
               ),
 
               const SizedBox(height: 32),
