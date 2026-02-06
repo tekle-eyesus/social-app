@@ -6,13 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
-import 'package:socialapp/widget/drop_down.dart';
 import 'package:socialapp/widget/my_button.dart';
 import 'package:socialapp/widget/signup.dart';
 
 class RegisterScreen extends StatefulWidget {
   final void Function()? onTap;
-  RegisterScreen({super.key, required this.onTap});
+  const RegisterScreen({super.key, required this.onTap});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -20,12 +19,10 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController usernameController = TextEditingController();
-
   final TextEditingController confirmPassController = TextEditingController();
+
   String? selectedProfession;
   final List<String> professions = [
     'Software Engineer',
@@ -44,7 +41,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Mobile App Developer',
     'Technical Writer',
   ];
-//add user data to db
+
+  //add user data to db
   Future<void> addUserToDB(UserCredential? userData) async {
     if (userData?.user != null && userData != null) {
       FirebaseFirestore db = FirebaseFirestore.instance;
@@ -89,180 +87,200 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Theme.of(context).colorScheme.background,
-      backgroundColor: const Color.fromARGB(255, 6, 16, 88),
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text("REGISTER",
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Colors.white,
-                    // fontFamily: 'poppins',
-                    fontSize: 20,
-                  )),
-        ),
-        backgroundColor: const Color.fromARGB(255, 6, 16, 88),
-        actions: [
-          Image.asset(
-            "assets/images/illu3.png",
-            height: 60,
-          )
-        ],
-      ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(25),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade100,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(50),
-            ),
-          ),
-          child: ListView(
-            // mainAxisAlignment: MainAxisAlignment.center,
+      backgroundColor: const Color(0xFFF7F8FC),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(
-                height: 50,
+              const SizedBox(height: 32),
+
+              Text(
+                "Create Account",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                      fontFamily: 'poppins',
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1F2937),
+                    ),
               ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                "Join the vibe and start connecting 🚀",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'poppins',
+                  color: const Color(0xFF6B7280),
+                  fontSize: 14,
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              Image.asset(
+                "assets/images/illu3.png",
+                height: 150,
+              ),
+
+              const SizedBox(height: 32),
+
               CustomTextfield(
-                  hintText: "username",
-                  obscureText: false,
-                  controller: usernameController),
-              const SizedBox(
-                height: 15,
+                hintText: "Username",
+                obscureText: false,
+                controller: usernameController,
               ),
+
+              const SizedBox(height: 14),
+
               CustomTextfield(
-                  hintText: "Email",
-                  obscureText: false,
-                  controller: emailController),
-              const SizedBox(
-                height: 15,
+                hintText: "Email address",
+                obscureText: false,
+                controller: emailController,
               ),
+
+              const SizedBox(height: 14),
+
+              // Profession Dropdown (Styled like TextField)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade100,
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
                   boxShadow: const [
                     BoxShadow(
                       color: Colors.black12,
-                      blurRadius: 8,
+                      blurRadius: 6,
                       offset: Offset(0, 2),
                     ),
                   ],
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    borderRadius: BorderRadius.circular(25),
                     value: selectedProfession,
                     hint: Text(
-                      'Select Profession',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+                      "Select profession",
+                      style: TextStyle(
+                        fontFamily: 'poppins',
+                        color: const Color(0xFF9CA3AF),
+                      ),
                     ),
-                    icon: const Icon(Icons.arrow_drop_down,
-                        color: Colors.blueAccent),
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Color(0xFF4F6BED),
+                    ),
                     isExpanded: true,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                    items: professions.map((String profession) {
-                      return DropdownMenuItem<String>(
+                    items: professions.map((profession) {
+                      return DropdownMenuItem(
                         value: profession,
-                        child: Text(profession),
+                        child: Text(
+                          profession,
+                          style: const TextStyle(fontFamily: 'poppins'),
+                        ),
                       );
                     }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedProfession = newValue;
-                      });
+                    onChanged: (value) {
+                      setState(() => selectedProfession = value);
                     },
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+
+              const SizedBox(height: 14),
+
               CustomTextfield(
-                  hintText: "password",
-                  obscureText: true,
-                  controller: passwordController),
-              const SizedBox(
-                height: 15,
+                hintText: "Password",
+                obscureText: true,
+                controller: passwordController,
               ),
+
+              const SizedBox(height: 14),
+
               CustomTextfield(
-                  hintText: "confirm password",
-                  obscureText: true,
-                  controller: confirmPassController),
-              const SizedBox(
-                height: 15,
+                hintText: "Confirm password",
+                obscureText: true,
+                controller: confirmPassController,
               ),
-              const SizedBox(
-                height: 10,
+
+              const SizedBox(height: 28),
+
+              SizedBox(
+                height: 52,
+                child: MyButton(
+                  text: "Create Account",
+                  onTap: handleRegister,
+                ),
               ),
-              MyButton(
-                text: "Register",
-                onTap: handleRegister,
-              ),
-              const SizedBox(
-                height: 25,
-              ),
+
+              const SizedBox(height: 24),
+
+              // Login redirect
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already Registerd?",
+                    "Already have an account?",
                     style: TextStyle(
                       fontFamily: 'poppins',
-                      color: Theme.of(context).colorScheme.inversePrimary,
+                      color: const Color(0xFF6B7280),
                     ),
                   ),
-                  const SizedBox(
-                    width: 3,
-                  ),
+                  const SizedBox(width: 6),
                   GestureDetector(
                     onTap: widget.onTap,
-                    child: const Text(
-                      "Login Here",
+                    child: Text(
+                      "Login",
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'poppins',
-                          color: Color.fromARGB(255, 5, 31, 163)),
+                        fontFamily: 'poppins',
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF4F6BED),
+                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
-              const SizedBox(
-                height: 35,
+
+              const SizedBox(height: 32),
+
+              // Divider
+              Row(
+                children: const [
+                  Expanded(child: Divider()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text("or sign up with"),
+                  ),
+                  Expanded(child: Divider()),
+                ],
               ),
-              const Text(
-                "~Or, Sign up with~",
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              const Row(
+
+              const SizedBox(height: 20),
+
+              // Social buttons
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   AuthComponenet(
                     icon: FontAwesomeIcons.google,
-                    iconColor: Color.fromARGB(255, 29, 163, 33),
+                    iconColor: Color(0xFFDB4437),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
+                  SizedBox(width: 16),
                   AuthComponenet(
                     icon: FontAwesomeIcons.facebook,
-                    iconColor: Colors.white,
+                    iconColor: Color(0xFF1877F2),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
+                  SizedBox(width: 16),
                   AuthComponenet(
                     icon: FontAwesomeIcons.github,
-                    iconColor: Colors.white,
+                    iconColor: Colors.black,
                   ),
                 ],
-              )
+              ),
+
+              const SizedBox(height: 40),
             ],
           ),
         ),
