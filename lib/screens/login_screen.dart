@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
 import 'package:socialapp/widget/my_button.dart';
-import 'package:socialapp/widget/signup.dart';
 
 class LoginScreen extends StatefulWidget {
   final void Function()? onTap;
