@@ -50,120 +50,123 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // backgroundColor: Theme.of(context).colorScheme.background,
-        backgroundColor: Color.fromARGB(255, 6, 16, 88),
-        appBar: AppBar(
-          title: Text("VibeHub",
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Color.fromARGB(255, 6, 16, 88),
-                    fontFamily: 'poppins',
-                    fontSize: 36,
-                  )),
-          toolbarHeight: 100,
-          titleSpacing: 7,
-          backgroundColor: Colors.blue.shade500,
-          bottom: PreferredSize(
-              preferredSize: Size(double.infinity, 50),
-              child: Container(
-                width: double.infinity,
-                height: 70,
-                color: Color.fromARGB(255, 6, 16, 88),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                  child: Text("CONNECT",
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Colors.white,
-                            fontFamily: 'sofa',
-                            fontSize: 20,
-                          )),
+      backgroundColor: const Color(0xFFF7F8FC),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 40),
+
+              // App Title
+              Text(
+                "VibeHub",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                      fontFamily: 'poppins',
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1F2937),
+                    ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                "Connect. Share. Feel the vibe ✨",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFF6B7280),
+                  fontSize: 14,
+                  fontFamily: 'poppins',
                 ),
-              )),
-        ),
-        body: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(25),
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.blue.shade100,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+              ),
+
+              const SizedBox(height: 40),
+
+              // Illustration
+              Image.asset(
+                "assets/images/illu1.png",
+                height: 160,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Email
+              CustomTextfield(
+                hintText: "Email Address",
+                obscureText: false,
+                controller: emailController,
+              ),
+
+              const SizedBox(height: 14),
+
+              // Password
+              CustomTextfield(
+                hintText: "Password",
+                obscureText: true,
+                controller: passwordController,
+              ),
+
+              const SizedBox(height: 12),
+
+              // Forgot password
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "Forgot password?",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: const Color(0xFF4F6BED),
+                    fontFamily: 'poppins',
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // Login Button
+              SizedBox(
+                height: 60,
+                child: MyButton(
+                  text: "Login",
+                  onTap: handleLogIn,
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // Register
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    "assets/images/illu1.png",
-                    height: 150,
+                  Text(
+                    "Don’t have an account?",
+                    style: TextStyle(
+                      fontFamily: 'poppins',
+                      color: const Color(0xFF6B7280),
+                    ),
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  CustomTextfield(
-                      hintText: "Email Address",
-                      obscureText: false,
-                      controller: emailController),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  CustomTextfield(
-                      hintText: "password",
-                      obscureText: true,
-                      controller: passwordController),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Forgot Password?",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                        ),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: widget.onTap,
+                    child: Text(
+                      "Register",
+                      style: TextStyle(
+                        fontFamily: 'poppins',
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF4F6BED),
                       ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 39,
-                  ),
-                  MyButton(
-                    text: "Login",
-                    onTap: handleLogIn,
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Already have an account?",
-                        style: TextStyle(
-                            // color: Theme.of(context).colorScheme.inversePrimary,
-                            fontFamily: 'poppins'),
-                      ),
-                      const SizedBox(
-                        width: 3,
-                      ),
-                      GestureDetector(
-                        onTap: widget.onTap,
-                        child: const Text(
-                          "Register Here",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'poppins',
-                              color: Color.fromARGB(255, 1, 95, 173)),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 30,
+                    ),
                   ),
                 ],
               ),
-            )));
 
-    ///main thing
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
