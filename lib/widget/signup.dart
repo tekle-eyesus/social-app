@@ -12,16 +12,16 @@ class AuthComponenet extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 60,
-        height: 60,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 33, 38, 183),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
           color: iconColor,
-          size: 40,
+          size: 23,
         ),
       ),
     );
