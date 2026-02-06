@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
+import 'package:socialapp/widget/forgot_password_sheet.dart';
 import 'package:socialapp/widget/my_button.dart';
 import 'package:socialapp/widget/signup.dart';
 
@@ -120,14 +121,27 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 15),
 
               // Forgot password
-              const Align(
+              Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  "Forgot password?",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(199, 79, 108, 237),
+                child: TextButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => const ForgotPasswordSheet(),
+                    );
+                  },
+                  child: Text(
+                    "Forgot password?",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                      color: Color.fromARGB(199, 79, 108, 237),
+                    ),
                   ),
                 ),
               ),
