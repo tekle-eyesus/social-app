@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
 import 'package:socialapp/widget/my_button.dart';
+import 'package:socialapp/widget/signup.dart';
 
 class LoginScreen extends StatefulWidget {
   final void Function()? onTap;
@@ -195,21 +197,19 @@ class _LoginScreenState extends State<LoginScreen> {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Google
-                  Icon(
-                    Icons.g_mobiledata,
-                    size: 50,
-                    color: Colors.red,
+                  AuthComponenet(
+                    icon: FontAwesomeIcons.google,
+                    iconColor: Color(0xFFDB4437),
                   ),
-                  SizedBox(width: 24),
-                  // Apple
-                  Icon(Icons.apple, size: 40),
-                  SizedBox(width: 24),
-                  // Facebook
-                  Icon(
-                    Icons.facebook,
-                    size: 40,
-                    color: Colors.blue,
+                  SizedBox(width: 16),
+                  AuthComponenet(
+                    icon: FontAwesomeIcons.facebook,
+                    iconColor: Color(0xFF1877F2),
+                  ),
+                  SizedBox(width: 16),
+                  AuthComponenet(
+                    icon: FontAwesomeIcons.github,
+                    iconColor: Colors.black,
                   ),
                 ],
               ),
