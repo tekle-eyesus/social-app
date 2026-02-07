@@ -147,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: NestedScrollView(
         floatHeaderSlivers: true,
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -158,7 +159,6 @@ class _HomeScreenState extends State<HomeScreen> {
               leadingWidth: 46,
               foregroundColor: AppColors.primaryText,
               backgroundColor: AppColors.surface,
-              // elevation: 0,
               leading: const Row(
                 children: [
                   SizedBox(
@@ -208,7 +208,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.secondaryColor,
+                        color: Colors.grey.shade700,
+                        strokeWidth: 2,
                       ),
                     );
                   } else if (snapshot.hasError) {
@@ -236,15 +237,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           final commentCount = postData['commentsCount'] ?? 0;
                           final likedBy = List.from(postData['likedBy'] ?? []);
                           final userLiked = likedBy.contains(
-                              FirebaseAuth.instance.currentUser!.email);
+                            FirebaseAuth.instance.currentUser!.email,
+                          );
                           return Container(
-                            height: (postData['imageUrl'] != null) ? 377 : 180,
+                            //  flexible height based on content and image presence
+                            height: (postData['imageUrl'] != null) ? 385 : 210,
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             padding: const EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
-                                color: Color.fromARGB(196, 250, 249, 249),
-                                borderRadius: BorderRadius.circular(10)),
+                              color: const Color.fromARGB(196, 250, 249, 249),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: Column(
                               children: [
                                 ListTile(
@@ -263,9 +267,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                   leading: Container(
                                     clipBehavior: Clip.hardEdge,
                                     margin: const EdgeInsets.only(
-                                        left: 5, right: 5),
+                                      left: 5,
+                                      right: 5,
+                                    ),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.blueGrey.shade200,
+                                        width: 1.5,
+                                      ),
                                     ),
                                     child: Image.network(
                                       postData['profile'],
@@ -276,7 +286,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   title: Text(
                                     usernameText(
-                                        postData['username'].toString()),
+                                      postData['username'].toString(),
+                                    ),
                                     style: const TextStyle(
                                       color: Color.fromARGB(255, 21, 45, 81),
                                       fontWeight: FontWeight.w600,
@@ -323,13 +334,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: Colors.grey,
                                     ),
                                     onPressed: () {
-                                      // Define action for the menu, if any
+                                      print(
+                                        "show post options like edit delete",
+                                      );
                                     },
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 20),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                    horizontal: 20,
+                                  ),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     postData['content'].toString(),
@@ -341,11 +356,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 if (postData["imageUrl"] != null)
                                   Container(
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 10),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                      ),
                                       clipBehavior: Clip.hardEdge,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(3),
                                       ),
                                       height: 200,
                                       child: Image.network(
@@ -366,8 +382,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         },
                                         errorBuilder:
                                             (context, error, stackTrace) {
-                                          return Center(
-                                              child: Icon(Icons.error));
+                                          return const Center(
+                                            child: Icon(Icons.error),
+                                          );
                                         },
                                       )),
                                 Row(
@@ -391,19 +408,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 2, horizontal: 3),
-                                      decoration: const BoxDecoration(
-                                          color: Color.fromARGB(97, 0, 0, 0),
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(1),
-                                              bottomLeft: Radius.circular(7),
-                                              topRight: Radius.circular(10),
-                                              bottomRight: Radius.circular(7))),
                                       child: Text(
-                                        '$likeCount likes',
+                                        '$likeCount',
                                         style: const TextStyle(
-                                          color: Colors.white,
+                                          fontSize: 20,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -422,24 +431,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                       icon: const FaIcon(
                                         FontAwesomeIcons.comment,
+                                        size: 20,
+                                        color: Colors.grey,
                                       ),
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 2, horizontal: 3),
-                                      decoration: const BoxDecoration(
-                                          color: Color.fromARGB(97, 0, 0, 0),
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(1),
-                                              bottomLeft: Radius.circular(7),
-                                              topRight: Radius.circular(10),
-                                              bottomRight: Radius.circular(7))),
                                       child: Text(
-                                        '$commentCount comments',
+                                        '$commentCount',
                                         style: const TextStyle(
-                                          color: Colors.white,
+                                          fontSize: 17,
+                                          color: Colors.black,
                                         ),
                                       ),
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      onPressed: () {
+                                        print("share logic here");
+                                      },
+                                      icon: const FaIcon(
+                                        FontAwesomeIcons.share,
+                                        size: 20,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
                                     ),
                                   ],
                                 )
@@ -456,7 +473,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      backgroundColor: Colors.blue.shade100,
     );
   }
 }
