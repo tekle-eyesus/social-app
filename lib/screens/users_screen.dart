@@ -32,17 +32,14 @@ class UsersScreen extends StatelessWidget {
 
             return CustomScrollView(
               slivers: [
-                // 1. MATCHES HEADER
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, top: 20, bottom: 10),
+                    padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
                     child: Text(
-                      "MATCHES",
+                      "USERS",
                       style: TextStyle(
-                        color: Colors.deepOrange
-                            .shade400, // Slightly colored like the inspo
-                        fontSize: 12,
+                        color: Colors.black,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
                       ),
@@ -50,10 +47,10 @@ class UsersScreen extends StatelessWidget {
                   ),
                 ),
 
-                // 2. HORIZONTAL LIST (Matches)
+                // 2. HORIZONTAL LIST (Users)
                 SliverToBoxAdapter(
                   child: SizedBox(
-                    height: 110, // Fixed height for the horizontal section
+                    height: 110,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: users.length,
@@ -89,7 +86,6 @@ class UsersScreen extends StatelessWidget {
                               // Name & Age
                               Text(
                                 "${userData['username']}",
-                                // In real app: add age here like "${userData['username']}, 23"
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -106,7 +102,6 @@ class UsersScreen extends StatelessWidget {
                   ),
                 ),
 
-                // 3. SEARCH BAR
                 SliverToBoxAdapter(
                   child: Container(
                     margin: const EdgeInsets.symmetric(
@@ -138,7 +133,7 @@ class UsersScreen extends StatelessWidget {
                   ),
                 ),
 
-                // 4. CHAT HEADER
+                // CHAT HEADER
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -231,7 +226,6 @@ class UsersScreen extends StatelessWidget {
                                 ),
                               ),
 
-                              // Time
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
