@@ -8,11 +8,10 @@ class UsersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine colors based on theme (assuming you might want dark mode support later)
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color bgColor = isDark ? Colors.black : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black;
-    final Color secondaryText = Colors.grey;
+    const Color secondaryText = Colors.grey;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -47,7 +46,7 @@ class UsersScreen extends StatelessWidget {
                   ),
                 ),
 
-                // 2. HORIZONTAL LIST (Users)
+                // HORIZONTAL LIST (Users)
                 SliverToBoxAdapter(
                   child: SizedBox(
                     height: 110,
@@ -59,31 +58,57 @@ class UsersScreen extends StatelessWidget {
                         Map<String, dynamic> userData =
                             users[index].data() as Map<String, dynamic>;
 
+                        // --- SIMPLE LOGIC FOR NOW ---
+                        bool isOnline = index % 2 == 0;
+
                         return Container(
-                          width: 85, // Width of each item
+                          width: 85,
                           margin: const EdgeInsets.symmetric(horizontal: 5),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Avatar
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 2),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: CircleAvatar(
-                                    radius: 32,
-                                    backgroundColor: Colors.grey.shade200,
-                                    backgroundImage:
-                                        NetworkImage(userData['profilePic']),
+                              Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 2),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: CircleAvatar(
+                                        radius: 32,
+                                        backgroundColor: Colors.grey.shade200,
+                                        backgroundImage: NetworkImage(
+                                            userData['profilePic']),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  if (isOnline)
+                                    Positioned(
+                                      bottom: 4,
+                                      right: 4,
+                                      child: Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
+
                               const SizedBox(height: 8),
-                              // Name & Age
+
+                              // Name
                               Text(
                                 "${userData['username']}",
                                 maxLines: 1,
@@ -134,10 +159,9 @@ class UsersScreen extends StatelessWidget {
                 ),
 
                 // CHAT HEADER
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Text(
                       "CHAT",
                       style: TextStyle(
@@ -217,7 +241,7 @@ class UsersScreen extends StatelessWidget {
                                           "New match! Say hello 👋",
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: secondaryText,
                                         fontSize: 14,
                                       ),
@@ -226,7 +250,7 @@ class UsersScreen extends StatelessWidget {
                                 ),
                               ),
 
-                              Column(
+                              const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
