@@ -126,3 +126,7 @@ Future<Map<String, dynamic>?> fetchUserDataById(String userId) async {
     return null;
   }
 }
+
+String usernameText(String username) {
+  return username[0].toUpperCase() + username.substring(1);
+}

@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/screens/user_profile_screen.dart';
-import 'package:socialapp/screens/users_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/comment_sheet.dart';
-import 'package:socialapp/widget/post_stats.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -126,10 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  String usernameText(String username) {
-    return username[0].toUpperCase() + username.substring(1);
-  }
-
   Future<Map<String, dynamic>?> getUserInfo() async {
     // Fetch user information using the helper function
     Map<String, dynamic>? userInfo = await fetchCurrentUserInfo();
@@ -161,15 +155,13 @@ class _HomeScreenState extends State<HomeScreen> {
               floating: true,
               snap: true,
               centerTitle: true,
-
               leadingWidth: 46,
-
               foregroundColor: AppColors.primaryText,
               backgroundColor: AppColors.surface,
               // elevation: 0,
-              leading: Row(
+              leading: const Row(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 6,
                   ),
                   CircleAvatar(
@@ -178,41 +170,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              title: Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.blue.shade300, Colors.blue.shade100]),
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search...",
-                    contentPadding: EdgeInsets.all(3),
-                    prefixIcon: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                      child: FaIcon(
-                        FontAwesomeIcons.search,
-                        size: 20,
-                        color: Color.fromARGB(255, 240, 236, 236),
-                      ),
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
+              title: const Text(
+                "Feed",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 21, 45, 81)),
               ),
               actions: [
                 IconButton(
-                    // Use the FaIcon Widget + FontAwesomeIcons class for the IconData
-                    icon: const FaIcon(
-                      FontAwesomeIcons.comment,
-                      size: 25,
-                      color: Colors.blue,
-                    ),
-                    onPressed: () {
-                      print("Pressed");
-                    }),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.search,
+                    size: 25,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    print("search logic here");
+                  },
+                ),
                 const SizedBox(
                   width: 6,
                 ),
