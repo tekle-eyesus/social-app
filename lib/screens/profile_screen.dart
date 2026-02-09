@@ -338,9 +338,10 @@ class PostGridView extends StatelessWidget {
                         height: 250,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          image: const DecorationImage(
+                          image: DecorationImage(
                             image: NetworkImage(
-                                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_640.jpg"), // Using your placeholder
+                              postData['imageUrl'],
+                            ),
                             fit: BoxFit.cover,
                           ),
                         ),
