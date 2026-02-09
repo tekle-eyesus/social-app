@@ -1,13 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:socialapp/theme/app_colors.dart';
-import 'package:socialapp/widget/profile_post.dart';
-import 'package:socialapp/widget/profile_summery.dart';
-import "./../helpers/helper_functions.dart";
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -24,8 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController =
-        TabController(length: 2, vsync: this); // 2 tabs: Posts & Favorites
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -51,225 +44,234 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final secondaryText = Colors.grey.shade600;
+
     return Scaffold(
-      backgroundColor: Colors.blue.shade100,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade100,
+        elevation: 0,
+        backgroundColor: bgColor,
+        title: Text(
+          "Profile",
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: handleSignOut,
-            icon: FaIcon(Icons.logout),
+            icon: FaIcon(
+              Icons.logout_rounded,
+              color: Colors.red.shade400,
+            ),
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: FutureBuilder<Map<String, dynamic>?>(
-              future: getUserData(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text(snapshot.error.toString());
-                } else if (snapshot.hasData) {
-                  Map<String, dynamic> data = snapshot.data!;
-                  return Column(
+      body: FutureBuilder<Map<String, dynamic>?>(
+        future: getUserData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+          } else if (snapshot.hasData) {
+            Map<String, dynamic> data = snapshot.data!;
+            return Column(
+              children: [
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
                     children: [
-                      Column(
-                        children: [
-                          Container(
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              // border: Border.all(
-                              //   color:
-                              //       Colors.blue.shade800.withOpacity(0.7),
-                              //   width: 4,
-                              // ),
+                      // Profile Picture with Shadow/Border
+                      Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.grey.shade200,
+                              width: 3,
                             ),
-                            child: Image.network(
-                              data["profilePic"],
-                              fit: BoxFit.cover,
-                              height: 140,
-                            ),
-                          ),
-                        ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              )
+                            ]),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: NetworkImage(data["profilePic"]),
+                        ),
                       ),
-                      const SizedBox(
-                        width: 10,
+                      const SizedBox(height: 15),
+
+                      // Name
+                      Text(
+                        data['username'],
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: textColor,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "\@" + data['username'],
-                            style: const TextStyle(
-                              fontSize: 37,
-                              fontFamily: 'poppins',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            data['email'],
-                            style: const TextStyle(fontFamily: 'poppins'),
-                          ),
-                        ],
+
+                      // Email / Handle
+                      Text(
+                        data['email'],
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: secondaryText,
+                            fontWeight: FontWeight.w500),
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.solidHeart,
-                            color: Colors.red,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "13",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 22,
-                              fontFamily: 'teko',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Text(
-                            "•",
-                            style: TextStyle(
-                              fontFamily: 'poppins',
-                            ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          FaIcon(
-                            FontAwesomeIcons.solidStar,
-                            color: Color.fromARGB(255, 190, 172, 1),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "100",
-                            style: TextStyle(
-                              color: Colors.purple,
-                              fontSize: 22,
-                              fontFamily: 'teko',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+
+                      const SizedBox(height: 20),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          _buildStatItem("Likes", "13", isDark),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(73, 0, 0, 0),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Text(
-                              "Edit Profile",
-                              style: TextStyle(
-                                color: Colors.blue.shade100,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(73, 0, 0, 0),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Text(
-                              "Share Profile",
-                              style: TextStyle(
-                                color: Colors.blue.shade100,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
+                              height: 25,
+                              width: 1,
+                              color: Colors.grey.shade300,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 25)),
+                          _buildStatItem("Rating", "4.8", isDark),
                         ],
                       ),
 
                       const SizedBox(height: 20),
 
-                      // TabBar Section (Posts and Favorites)
-                      TabBar(
-                        controller: _tabController,
-                        indicatorColor: Colors.black,
-                        labelColor: Colors.black,
-                        tabs: const [
-                          Tab(
-                            icon: Icon(
-                              Icons.post_add,
-                              size: 30,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDark
+                                    ? Colors.grey.shade800
+                                    : Colors.black,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text("Edit Profile",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ),
-                          Tab(
-                            icon: Icon(
-                              Icons.favorite_border_outlined,
-                              size: 30,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {},
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: textColor,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text("Share",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ],
                       ),
-                      Expanded(
-                        // TabBarView containing grid views for Posts and Favorites
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            // Posts Tab Content
-                            PostGridView(),
-                            // Favorites Tab Content
-                            FavoriteGridView(),
-                          ],
-                        ),
-                      ),
                     ],
-                  );
-                } else {
-                  return const Text("not working....");
-                }
-              },
-            ),
-          ),
-        ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // --- TAB BAR ---
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade200))),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicatorColor: textColor,
+                    indicatorWeight: 2,
+                    labelColor: textColor,
+                    unselectedLabelColor: Colors.grey,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    tabs: const [
+                      Tab(
+                          icon: Icon(Icons.grid_on_rounded,
+                              size: 26)), // Instagram style Grid icon
+                      Tab(icon: Icon(Icons.favorite_border_rounded, size: 26)),
+                    ],
+                  ),
+                ),
+
+                // --- CONTENT ---
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      PostGridView(),
+                      FavoriteGridView(),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: Text("Something went wrong"));
+          }
+        },
       ),
+    );
+  }
+
+  // Helper widget for stats to keep code clean
+  Widget _buildStatItem(String label, String count, bool isDark) {
+    return Column(
+      children: [
+        Text(
+          count,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade500,
+          ),
+        ),
+      ],
     );
   }
 }
 
-// Dummy PostGridView Widget (You can replace this with real video widgets)
 class PostGridView extends StatelessWidget {
-  User? u = FirebaseAuth.instance.currentUser;
+  final User? u = FirebaseAuth.instance.currentUser;
+
+  PostGridView({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("posts")
@@ -277,140 +279,150 @@ class PostGridView extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              snapshot.error.toString(),
-            ),
-          );
+          return Center(child: Text(snapshot.error.toString()));
         } else if (snapshot.data!.docs.isEmpty) {
           return Center(
-            child: Text(
-              "No Post Available",
-              style: TextStyle(
-                  color: Colors.blue.shade900, fontWeight: FontWeight.bold),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FaIcon(FontAwesomeIcons.camera,
+                    size: 50, color: Colors.grey.shade300),
+                const SizedBox(height: 10),
+                Text("No Posts Yet",
+                    style: TextStyle(color: Colors.grey.shade500)),
+              ],
             ),
           );
         } else if (snapshot.hasData) {
           List<DocumentSnapshot> posts = snapshot.data!.docs;
 
-          return ListView.builder(
-            itemCount: posts.length, // Number of posts
+          return ListView.separated(
+            padding: const EdgeInsets.only(top: 10, bottom: 20),
+            itemCount: posts.length,
+            separatorBuilder: (ctx, i) => const Divider(
+                height: 30,
+                thickness: 8,
+                color: Color(0xFFF5F5F5)), // Divider between posts
             itemBuilder: (context, index) {
               Map<String, dynamic> postData =
                   posts[index].data() as Map<String, dynamic>;
+
               return Container(
-                clipBehavior: Clip.hardEdge,
-                // height: (postData['imageUrl'] != null) ? 50 : 100,
-
-                margin: const EdgeInsets.symmetric(
-                  vertical: 4.0,
-                  horizontal: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(69, 0, 3, 3),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                color: isDark ? Colors.black : Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //content
-
-                    if (postData['imageUrl'] != null)
-                      Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Image.network(
-                          "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_640.jpg",
-                          fit: BoxFit.cover,
-                          height: 200,
-                          width: double.infinity,
-                        ),
-                      ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
+                    // Post Content Text
+                    if (postData['content'] != null &&
+                        postData['content'].isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Text(
                           postData['content'],
                           style: TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            // fontFamily: 'roboto',
-                            fontSize: 17,
+                            fontSize: 16,
+                            color: isDark ? Colors.white : Colors.black87,
+                            height: 1.4,
                           ),
                         ),
-                      ],
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(
-                            Icons.favorite_border_outlined,
-                            size: 20,
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            postData['likesCount'].toString(),
-                            style: TextStyle(
-                              color: Colors.purple,
-                              fontSize: 17,
-                              fontFamily: 'teko',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
                       ),
+
+                    // Post Image
+                    if (postData['imageUrl'] != null)
+                      Container(
+                        width: double.infinity,
+                        height: 250,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: const DecorationImage(
+                            image: NetworkImage(
+                                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_640.jpg"), // Using your placeholder
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+
+                    const SizedBox(height: 12),
+
+                    // Action Bar (Likes)
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.heart,
+                            size: 20,
+                            color: isDark ? Colors.white : Colors.black),
+                        const SizedBox(width: 8),
+                        Text(
+                          postData['likesCount'].toString(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "likes",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: isDark ? Colors.white70 : Colors.black54),
+                        ),
+                        const Spacer(),
+                        FaIcon(FontAwesomeIcons.share,
+                            size: 20,
+                            color: isDark ? Colors.white : Colors.black),
+                      ],
                     )
                   ],
                 ),
-                // child: Image.network(
-                //   imageUrl[index],
-                //   fit: BoxFit.cover,
-                //   width: double.infinity,
-                // ),
               );
             },
           );
         }
-        return const Center(
-          child: Text("Something went wrong!!"),
-        );
+        return const Center(child: Text("Something went wrong!!"));
       },
     );
   }
 }
 
-// Dummy FavoriteGridView Widget (You can replace this with real video widgets)
 class FavoriteGridView extends StatelessWidget {
+  const FavoriteGridView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      padding: const EdgeInsets.all(2),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3, // 3 columns for favorites
-        childAspectRatio: 9 / 16, // Aspect ratio for favorites
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+        crossAxisSpacing: 2,
+        mainAxisSpacing: 2,
       ),
-      itemCount: 10, // Number of favorites
+      itemCount: 10,
       itemBuilder: (context, index) {
         return Container(
-          margin: const EdgeInsets.all(4.0),
-          color: Colors.greenAccent,
-          child: Center(
-            child: Text('Favorite $index',
-                style: const TextStyle(color: Colors.white)),
+          color: Colors.grey.shade300,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Placeholder image logic
+              Image.network(
+                "https://source.unsplash.com/random?sig=$index",
+                fit: BoxFit.cover,
+                errorBuilder: (c, e, s) => Container(
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.image, color: Colors.white)),
+              ),
+              // Overlay icon
+              const Align(
+                alignment: Alignment.center,
+                child: Icon(Icons.play_arrow_rounded,
+                    color: Colors.white, size: 30),
+              )
+            ],
           ),
         );
       },
