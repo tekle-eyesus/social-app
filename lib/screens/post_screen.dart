@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 
 class PostScreen extends StatefulWidget {
   const PostScreen({super.key});
@@ -44,8 +45,9 @@ class _PostScreenState extends State<PostScreen> {
     }
   }
 
-  Future pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future pickImage(String source) async {
+    final pickedFile = await picker.pickImage(
+        source: source == "camera" ? ImageSource.camera : ImageSource.gallery);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
@@ -76,8 +78,9 @@ class _PostScreenState extends State<PostScreen> {
 
   void handlePost() async {
     if (_messageController.text.isEmpty && _image == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please add text or an image")),
+      CustomSnackBar.showWarning(
+        context,
+        "Please add a message or an image before posting.",
       );
       return;
     }
@@ -124,19 +127,18 @@ class _PostScreenState extends State<PostScreen> {
           _isPosting = false;
         });
 // go back logic
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green,
-            content: Text("Posted successfully!"),
-          ),
+        CustomSnackBar.showSuccess(
+          context,
+          "Posted successfully!",
         );
       }
     } catch (e) {
       setState(() {
         _isPosting = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error posting: $e")),
+      CustomSnackBar.showError(
+        context,
+        "Failed to post. Please try again.",
       );
     }
   }
@@ -273,7 +275,6 @@ class _PostScreenState extends State<PostScreen> {
           ),
 
           // BOTTOM TOOLBAR
-          // This mimics the keyboard toolbar seen in modern apps
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
@@ -283,9 +284,18 @@ class _PostScreenState extends State<PostScreen> {
             child: Row(
               children: [
                 IconButton(
-                  onPressed: _isPosting ? null : pickImage,
-                  icon: const FaIcon(FontAwesomeIcons.image,
-                      color: Colors.blueAccent),
+                  onPressed: _isPosting ? null : () => pickImage("gallery"),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.image,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                IconButton(
+                  onPressed: _isPosting ? null : () => pickImage("camera"),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.camera,
+                    color: Colors.blueAccent,
+                  ),
                 ),
               ],
             ),
