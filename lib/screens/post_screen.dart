@@ -4,11 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:socialapp/screens/HomeScreen.dart';
 
 class PostScreen extends StatefulWidget {
+  const PostScreen({super.key});
   @override
   _PostScreenState createState() => _PostScreenState();
 }
@@ -18,71 +18,96 @@ class _PostScreenState extends State<PostScreen> {
   final picker = ImagePicker();
   final TextEditingController _messageController = TextEditingController();
 
+  // UX State variables
+  bool _isPosting = false;
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  String? _userProfilePic;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  // Fetch user profile mainly to show the Avatar next to the text box
+  void _fetchUserProfile() async {
+    if (currentUser != null) {
+      var doc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser!.email)
+          .get();
+      if (doc.exists && mounted) {
+        setState(() {
+          _userProfilePic = doc.data()?['profilePic'];
+        });
+      }
+    }
+  }
+
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
       }
     });
   }
 
-  Future<String> uploadImage(File image) async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: Colors.amber,
-            ),
-          );
-        });
-    if (_image != null) {
+  void removeImage() {
+    setState(() {
+      _image = null;
+    });
+  }
+
+  // Refactored: Uploads image and returns URL (or null)
+  Future<String?> uploadImage(File image) async {
+    try {
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       Reference firebaseStorageRef =
           FirebaseStorage.instance.ref().child('uploads/$fileName');
       UploadTask uploadTask = firebaseStorageRef.putFile(image);
       TaskSnapshot taskSnapshot = await uploadTask;
-      Navigator.pop(context);
       return await taskSnapshot.ref.getDownloadURL();
-    } else {
-      Navigator.pop(context);
-      return "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.townandcountrymag.com%2Fleisure%2Farts-and-culture%2Fa40363815%2Fjon-snow-game-of-thrones-spinoff%2F&psig=AOvVaw20xJWECdi9kOW7o7tALQpx&ust=1727658958911000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKj40uj95ogDFQAAAAAdAAAAABAJ";
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
     }
   }
 
-  void handlePost(String? imageUrl) async {
-    var userData;
-    User? loggedUser = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    if (_messageController.text.isNotEmpty) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.amber,
-              ),
-            );
-          });
-
-      final docRef = db.collection("users").doc(loggedUser!.email);
-      await docRef.get().then(
-        (DocumentSnapshot doc) {
-          userData = doc.data() as Map<String, dynamic>;
-          // ...
-          print(userData);
-        },
-        onError: (e) => print("Error getting document: $e"),
+  void handlePost() async {
+    if (_messageController.text.isEmpty && _image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please add text or an image")),
       );
+      return;
+    }
 
-      await db.collection("posts").doc().set({
-        "imageUrl": imageUrl,
+    // 1. SET LOADING STATE
+    setState(() {
+      _isPosting = true;
+    });
+
+    try {
+      FirebaseFirestore db = FirebaseFirestore.instance;
+
+      // Get fresh user data to ensure profession/name are up to date
+      DocumentSnapshot userDoc =
+          await db.collection("users").doc(currentUser!.email).get();
+      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+      String? imageUrl;
+
+      // 2. UPLOAD IMAGE IF EXISTS
+      if (_image != null) {
+        imageUrl = await uploadImage(_image!);
+      }
+
+      // 3. CREATE POST DOCUMENT
+      await db.collection("posts").add({
+        "imageUrl": imageUrl, // Can be null now, handled by UI later
         "content": _messageController.text,
-        "email": loggedUser.email, // acts as user id
-        "profession": userData["profession"],
+        "email": currentUser!.email,
+        "profession": userData["profession"] ?? "User",
         "username": userData['username'],
         "profile": userData['profilePic'],
         "likesCount": 0,
@@ -90,181 +115,182 @@ class _PostScreenState extends State<PostScreen> {
         "likedBy": [],
         "timeStamp": DateTime.now().toIso8601String(),
       });
-      Navigator.pop(context);
-      _messageController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        width: 200,
-        duration: const Duration(seconds: 1),
-        content: Container(
-          alignment: Alignment.center,
-          margin: const EdgeInsets.only(bottom: 50),
-          height: 44,
-          decoration: BoxDecoration(
-              color: Colors.deepPurple.shade200,
-              borderRadius: BorderRadius.circular(12)),
-          child: Text(
-            "POSTED !!!",
-            style: TextStyle(
-                color: Colors.deepPurple.shade600, fontFamily: 'poppins'),
+
+      // 4. RESET UI
+      if (mounted) {
+        _messageController.clear();
+        setState(() {
+          _image = null;
+          _isPosting = false;
+        });
+// go back logic
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Posted successfully!"),
           ),
-        ),
-        behavior: SnackBarBehavior.floating,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        width: 200,
-        duration: const Duration(seconds: 1),
-        content: Container(
-          alignment: Alignment.center,
-          margin: const EdgeInsets.only(bottom: 50),
-          height: 44,
-          decoration: BoxDecoration(
-            color: Colors.deepPurple.shade200,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            "Say something!!",
-            style: TextStyle(
-                color: Colors.deepPurple.shade600, fontFamily: 'poppins'),
-          ),
-        ),
-        behavior: SnackBarBehavior.floating,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ));
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isPosting = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error posting: $e")),
+      );
     }
-  }
-
-  Future<void> createPost(String message, File? image) async {
-    String? imageUrl;
-
-    if (image != null) {
-      imageUrl = await uploadImage(image);
-    }
-
-    // print(imageUrl);
-    // print(message);
-
-    handlePost(imageUrl);
-
-    // Save post to Firestore
-    // await FirebaseFirestore.instance.collection('posts').add({
-    //   'message': message,
-    //   'imageUrl': imageUrl,
-    //   'timestamp': FieldValue.serverTimestamp(),
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Scaffold(
-      backgroundColor: Colors.blue.shade100,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade100,
-        title: const Text(
-          'Create Post',
+        backgroundColor: bgColor,
+        elevation: 0,
+        title: Text(
+          "Create Post",
           style: TextStyle(
-            fontSize: 20,
-          ),
+              color: textColor, fontSize: 20, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          // MODERN POST BUTTON
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: ElevatedButton(
+              onPressed: _isPosting ? null : handlePost,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ),
+              child: _isPosting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      "Post",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+            ),
+          )
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Container(
-              padding:
-                  const EdgeInsets.only(top: 10, bottom: 10, left: 6, right: 3),
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 2,
+      body: Column(
+        children: [
+          if (_isPosting)
+            const LinearProgressIndicator(
+                minHeight: 2, color: Colors.blueAccent),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // USER AVATAR
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.grey.shade300,
+                    backgroundImage: _userProfilePic != null
+                        ? NetworkImage(_userProfilePic!)
+                        : null,
+                    child: _userProfilePic == null
+                        ? const Icon(Icons.person, color: Colors.grey)
+                        : null,
                   ),
-                  borderRadius: BorderRadius.circular(6)),
-              child: TextField(
-                maxLength: 50,
-                controller: _messageController,
-                decoration: InputDecoration(
-                    hintText: 'Enter your message', border: InputBorder.none),
+                  const SizedBox(width: 12),
+
+                  // INPUT AREA
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _messageController,
+                          enabled: !_isPosting,
+                          maxLines: null, // Auto expand
+                          style: TextStyle(fontSize: 18, color: textColor),
+                          decoration: InputDecoration(
+                            hintText: "What's happening?",
+                            hintStyle: TextStyle(color: Colors.grey.shade500),
+                            border: InputBorder.none,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // IMAGE PREVIEW
+                        if (_image != null)
+                          Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  _image!,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 5,
+                                right: 5,
+                                child: GestureDetector(
+                                  onTap: removeImage,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black54,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.close,
+                                        color: Colors.white, size: 20),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 15),
-            _image != null
-                ? Container(
-                    clipBehavior: Clip.hardEdge,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Image.file(
-                      _image!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : Row(
-                    children: [
-                      Icon(
-                        Icons.image,
-                        color: Colors.green,
-                      ),
-                      Text('No image selected.'),
-                    ],
-                  ),
-            SizedBox(height: 15),
-            Row(
+          ),
+
+          // BOTTOM TOOLBAR
+          // This mimics the keyboard toolbar seen in modern apps
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(
+                  top: BorderSide(color: Colors.grey.shade300, width: 0.5)),
+            ),
+            child: Row(
               children: [
-                ElevatedButton(
-                  style: ButtonStyle(
-                    padding: const MaterialStatePropertyAll(
-                      EdgeInsets.symmetric(
-                        horizontal: 45,
-                      ),
-                    ),
-                    iconColor: const MaterialStatePropertyAll(Colors.amber),
-                    backgroundColor: MaterialStatePropertyAll(
-                      Color.fromARGB(255, 151, 236, 14),
-                    ),
-                  ),
-                  onPressed: pickImage,
-                  child: Text(
-                    'Pick Image',
-                    style: TextStyle(color: Colors.black),
-                  ),
+                IconButton(
+                  onPressed: _isPosting ? null : pickImage,
+                  icon: const FaIcon(FontAwesomeIcons.image,
+                      color: Colors.blueAccent),
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: () async {
-                await createPost(_messageController.text, _image);
-
-                // ScaffoldMessenger.of(context)
-                //     .showSnackBar(SnackBar(content: Text('Post Created!')));
-                // _messageController.clear();
-                setState(() {
-                  _image = null;
-                });
-              },
-              child: Container(
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.only(top: 10, left: 5, right: 5),
-                alignment: Alignment.center,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.blue.shade300,
-                    borderRadius: BorderRadius.circular(5)),
-                child: const Text(
-                  'POST',
-                  style: TextStyle(
-                      color: Colors.white, fontFamily: 'poppins', fontSize: 20),
-                ),
-              ),
-            ),
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
