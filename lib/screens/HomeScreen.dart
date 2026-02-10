@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/post_card.dart';
+import 'package:socialapp/widget/post_shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -148,12 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.red.shade700,
-                        strokeWidth: 2,
-                      ),
-                    );
+                    return const PostShimmerLoading();
                   } else if (snapshot.hasError) {
                     return Text(snapshot.error.toString());
                   } else if (snapshot.data!.docs.isEmpty) {
