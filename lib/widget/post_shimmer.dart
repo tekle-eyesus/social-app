@@ -6,7 +6,6 @@ class PostShimmerLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We show a list of 5-6 dummy items to fill the screen
     return ListView.builder(
       padding: const EdgeInsets.only(top: 8, bottom: 67),
       itemCount: 6,
@@ -17,7 +16,6 @@ class PostShimmerLoading extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            // Optional: match your app's shadow style
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.1),
@@ -33,7 +31,6 @@ class PostShimmerLoading extends StatelessWidget {
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Header (Profile Pic + Name)
                 Row(
                   children: [
                     Skeleton(height: 45, width: 45, isCircle: true),
@@ -48,23 +45,21 @@ class PostShimmerLoading extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15),
 
-                // 2. Text Content (3 lines)
-                const Skeleton(height: 14, width: double.infinity),
-                const SizedBox(height: 8),
-                const Skeleton(height: 14, width: double.infinity),
-                const SizedBox(height: 8),
-                const Skeleton(height: 14, width: 200), // Short last line
+                Skeleton(height: 14, width: double.infinity),
+                SizedBox(height: 8),
+                Skeleton(height: 14, width: double.infinity),
+                SizedBox(height: 8),
+                Skeleton(height: 14, width: 200), // Short last line
 
-                const SizedBox(height: 15),
+                SizedBox(height: 15),
 
-                // 3. Image Placeholder (Large rectangle)
-                const Skeleton(height: 200, width: double.infinity),
+                Skeleton(height: 200, width: double.infinity),
 
-                const SizedBox(height: 15),
+                SizedBox(height: 15),
 
-                // 4. Footer (Action Buttons)
+                //  Footer (Action Buttons)
                 Row(
                   children: const [
                     Skeleton(height: 20, width: 20, isCircle: true),
@@ -102,8 +97,7 @@ class Skeleton extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: Colors
-            .black, // The shimmer package overrides this color, but it needs a color to paint.
+        color: Colors.black,
         borderRadius:
             isCircle ? BorderRadius.circular(height) : BorderRadius.circular(4),
       ),
