@@ -6,6 +6,7 @@ import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/screens/user_profile_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/comment_sheet.dart';
+import 'package:socialapp/widget/full_screen_image.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -355,38 +356,50 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 if (postData["imageUrl"] != null)
-                                  Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      clipBehavior: Clip.hardEdge,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(3),
-                                      ),
-                                      height: 200,
-                                      child: Image.network(
-                                        postData['imageUrl'],
-                                        width: double.infinity,
-                                        fit: BoxFit
-                                            .cover, // Fill the grid tile with the image
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                          if (loadingProgress == null)
-                                            return child;
-                                          return Center(
-                                              child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                            color: Colors.blue.shade900,
-                                          )));
-                                        },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Center(
-                                            child: Icon(Icons.error),
-                                          );
-                                        },
-                                      )),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(context,
+                                          MaterialPageRoute(builder: (context) {
+                                        return FullScreenImage(
+                                          imageFile: postData['imageUrl'],
+                                          tag: "postImage$index",
+                                        );
+                                      }));
+                                    },
+                                    child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(3),
+                                        ),
+                                        height: 200,
+                                        child: Image.network(
+                                          postData['imageUrl'],
+                                          width: double.infinity,
+                                          fit: BoxFit
+                                              .cover, // Fill the grid tile with the image
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Center(
+                                                child: Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                              color: Colors.blue.shade900,
+                                            )));
+                                          },
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(Icons.error),
+                                            );
+                                          },
+                                        )),
+                                  ),
                                 Row(
                                   children: [
                                     IconButton(
