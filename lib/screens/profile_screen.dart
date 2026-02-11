@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/widget/post_card.dart';
+import 'package:socialapp/widget/post_shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -280,7 +281,7 @@ class PostGridView extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const PostShimmerLoading();
         } else if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         } else if (snapshot.data!.docs.isEmpty) {
