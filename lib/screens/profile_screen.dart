@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/widget/post_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -308,77 +309,11 @@ class PostGridView extends StatelessWidget {
             itemBuilder: (context, index) {
               Map<String, dynamic> postData =
                   posts[index].data() as Map<String, dynamic>;
-
-              return Container(
-                color: isDark ? Colors.black : Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Post Content Text
-                    if (postData['content'] != null &&
-                        postData['content'].isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          postData['content'],
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: isDark ? Colors.white : Colors.black87,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-
-                    // Post Image
-                    if (postData['imageUrl'] != null)
-                      Container(
-                        width: double.infinity,
-                        height: 250,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              postData['imageUrl'],
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                    const SizedBox(height: 12),
-
-                    // Action Bar (Likes)
-                    Row(
-                      children: [
-                        FaIcon(FontAwesomeIcons.heart,
-                            size: 20,
-                            color: isDark ? Colors.white : Colors.black),
-                        const SizedBox(width: 8),
-                        Text(
-                          postData['likesCount'].toString(),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "likes",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: isDark ? Colors.white70 : Colors.black54),
-                        ),
-                        const Spacer(),
-                        FaIcon(FontAwesomeIcons.share,
-                            size: 20,
-                            color: isDark ? Colors.white : Colors.black),
-                      ],
-                    )
-                  ],
-                ),
+              String docId = posts[index].id;
+              return PostItem(
+                postData: postData,
+                docId: docId,
+                index: index,
               );
             },
           );
