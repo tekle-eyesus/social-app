@@ -45,6 +45,9 @@ dependencies:
   file_picker: ^10.3.10
   photo_view: ^0.15.0
   shimmer: ^3.0.0
+  google_generative_ai: ^0.4.7
+  flutter_dotenv: ^6.0.0
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +79,7 @@ flutter:
     - assets/images/illu2.png
     - assets/images/illu3.png
     - assets/images/chat1.jpg
+    - assets/images/modelicon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
