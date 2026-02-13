@@ -382,7 +382,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     onPressed: () async {
                                       var userInfo = await getUserInfo();
                                       showCommentsBottomSheet(context, post.id,
-                                          userInfo!['username'].toString());
+                                          userInfo: {
+                                            'username': userInfo!['username'],
+                                            'profilePic':
+                                                userInfo['profilePic'],
+                                          });
                                     },
                                   ),
                                   Text('$commentCount comments'),
