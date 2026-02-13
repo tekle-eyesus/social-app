@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/post_card.dart';
 import 'package:socialapp/widget/post_shimmer.dart';
 
@@ -27,17 +28,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  Future<Map<String, dynamic>?> getUserData() async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentSnapshot doc =
-        await db.collection("users").doc(loggedUser?.email).get();
-    if (doc.exists) {
-      return doc.data() as Map<String, dynamic>;
-    } else {
-      return null;
-    }
   }
 
   void handleSignOut() {
@@ -76,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>?>(
-        future: getUserData(),
+        future: fetchCurrentUserInfo(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -272,12 +262,13 @@ class PostGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("posts")
-          .where('email', isEqualTo: u!.email.toString())
+          .where(
+            'email',
+            isEqualTo: u!.email.toString(),
+          )
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -347,11 +338,12 @@ class FavoriteGridView extends StatelessWidget {
             children: [
               // Placeholder image logic
               Image.network(
-                "https://source.unsplash.com/random?sig=$index",
+                "https://picsum.photos/200?random=$index",
                 fit: BoxFit.cover,
                 errorBuilder: (c, e, s) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(Icons.image, color: Colors.white)),
+                  color: Colors.grey.shade300,
+                  child: const Icon(Icons.image, color: Colors.white),
+                ),
               ),
               // Overlay icon
               const Align(
