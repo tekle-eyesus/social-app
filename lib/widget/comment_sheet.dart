@@ -5,14 +5,16 @@ import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/comment_item.dart';
 import 'package:socialapp/widget/comment_shimmer.dart';
 
-void showCommentsBottomSheet(
-    BuildContext context, String postId, String currentUsername) {
+void showCommentsBottomSheet(BuildContext context, String postId,
+    {required Map<String, dynamic> userInfo}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(16),
+      ),
     ),
     builder: (context) {
       return DraggableScrollableSheet(
@@ -24,7 +26,7 @@ void showCommentsBottomSheet(
           return CommentSheetContent(
             scrollController: controller,
             postId: postId,
-            currentUsername: currentUsername,
+            userInfo: userInfo,
           );
         },
       );
@@ -35,13 +37,13 @@ void showCommentsBottomSheet(
 class CommentSheetContent extends StatefulWidget {
   final ScrollController scrollController;
   final String postId;
-  final String currentUsername;
+  final Map<String, dynamic> userInfo;
 
   const CommentSheetContent({
     Key? key,
     required this.scrollController,
     required this.postId,
-    required this.currentUsername,
+    required this.userInfo,
   }) : super(key: key);
 
   @override
@@ -55,7 +57,6 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
-
     return Column(
       children: [
         Container(
@@ -161,10 +162,12 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
           ),
           child: Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 18,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, color: Colors.white, size: 20),
+                backgroundImage: NetworkImage(
+                  widget.userInfo['profileImage'] ??
+                      'https://via.placeholder.com/150',
+                ),
               ),
               const SizedBox(width: 10),
 
@@ -203,11 +206,11 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.arrow_upward,
-                            color: Colors.blue, size: 20),
+                            color: Colors.black, size: 20),
                       ),
                     ),
             ],
@@ -235,8 +238,8 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
           .collection('comments')
           .add({
         'userId': currentUserEmail,
-        'username': widget.currentUsername,
-        'profilePic': userData!['profilePic'],
+        'username': widget.userInfo['username'],
+        'profilePic': widget.userInfo['profilePic'],
         'commentText': _commentController.text.trim(),
         'timestamp': DateTime.now().toIso8601String(),
         'likes': [], // Initialize empty likes

@@ -48,20 +48,6 @@ class _PostItemState extends State<PostItem> {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserInfo() async {
-    // Fetch user information using the helper function
-    Map<String, dynamic>? userInfo = await fetchCurrentUserInfo();
-
-    if (userInfo != null) {
-      // If user info is found, return it
-      return userInfo;
-    } else {
-      // Return null if user is not found or not logged in
-      print("User not found or not logged in.");
-      return null;
-    }
-  }
-
   /// COMMENT IMPLEMENTATION
   Future<void> addComment(
       String postId, String userId, String username, String commentText) async {
@@ -256,7 +242,8 @@ class _PostItemState extends State<PostItem> {
                     color: userLiked ? Colors.red : Colors.grey,
                   ),
                   onPressed: () async {
-                    Map<String, dynamic>? userInfo = await getUserInfo();
+                    Map<String, dynamic>? userInfo =
+                        await fetchCurrentUserInfo();
                     likePost(widget.docId, userInfo!['email']);
                   },
                 ),
@@ -266,9 +253,16 @@ class _PostItemState extends State<PostItem> {
                 const SizedBox(width: 15),
                 IconButton(
                   onPressed: () async {
-                    Map<String, dynamic>? userInfo = await getUserInfo();
-                    showCommentsBottomSheet(context, widget.docId,
-                        userInfo!['username'].toString());
+                    Map<String, dynamic>? userInfo =
+                        await fetchCurrentUserInfo();
+                    showCommentsBottomSheet(
+                      context,
+                      widget.docId,
+                      userInfo: {
+                        'username': userInfo!['username'],
+                        'profileImage': userInfo['profilePic'],
+                      },
+                    );
                   },
                   icon: const FaIcon(FontAwesomeIcons.comment,
                       size: 20, color: Colors.grey),
