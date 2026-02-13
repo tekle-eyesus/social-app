@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/widget/full_screen_image.dart';
 import 'package:socialapp/widget/post_card.dart';
 import 'package:socialapp/widget/post_shimmer.dart';
 
@@ -337,12 +338,27 @@ class FavoriteGridView extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // Placeholder image logic
-              Image.network(
-                "https://picsum.photos/200?random=$index",
-                fit: BoxFit.cover,
-                errorBuilder: (c, e, s) => Container(
-                  color: Colors.grey.shade300,
-                  child: const Icon(Icons.image, color: Colors.white),
+              InkWell(
+                onTap: () {
+                  // full screen image view ( for now)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return FullScreenImage(
+                        tag: "$index",
+                        imageFile: "https://picsum.photos/500?random=$index",
+                      );
+                    }),
+                  );
+                },
+                // random images from picsum for demo purposes
+                child: Image.network(
+                  "https://picsum.photos/200?random=$index",
+                  fit: BoxFit.cover,
+                  errorBuilder: (c, e, s) => Container(
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.image, color: Colors.white),
+                  ),
                 ),
               ),
               // Overlay icon
