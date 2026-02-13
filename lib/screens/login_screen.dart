@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
 import 'package:socialapp/widget/forgot_password_sheet.dart';
 import 'package:socialapp/widget/my_button.dart';
@@ -30,8 +31,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) setState(() => _isLoading = false);
     } on FirebaseAuthException catch (e) {
       setState(() => _isLoading = false);
-      // DisplayErrorMessage(e.code, context);
-      showCustomSnackbar(context, e.code);
+      if (e.code == 'user-not-found') {
+        CustomSnackBar.showError(context, "No user found for that email.");
+      } else if (e.code == 'wrong-password') {
+        CustomSnackBar.showError(
+            context, "Wrong password provided for that user.");
+      } else {
+        CustomSnackBar.showError(
+            context, "An error occurred. Please try again.");
+      }
     }
   }
 

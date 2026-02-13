@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 
 class ForgotPasswordSheet extends StatefulWidget {
   const ForgotPasswordSheet({super.key});
@@ -34,7 +35,7 @@ class _ForgotPasswordSheetState extends State<ForgotPasswordSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        showCustomSnackbar(
+        CustomSnackBar.showSuccess(
           context,
           "Reset Link sent successfully! Please check your email.",
         );
@@ -48,12 +49,12 @@ class _ForgotPasswordSheetState extends State<ForgotPasswordSheet> {
       }
 
       if (mounted) {
-        showCustomSnackbar(context, errorMessage);
+        CustomSnackBar.showError(context, errorMessage);
       }
     } catch (e) {
       if (mounted) {
         // CustomSnackBar.showError(context, "Error: ${e.toString()}");
-        showCustomSnackbar(
+        CustomSnackBar.showError(
           context,
           "An unexpected error occurred. Please try again later.",
         );

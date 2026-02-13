@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
 import 'package:socialapp/widget/my_button.dart';
 import 'package:socialapp/widget/signup.dart';
@@ -68,7 +66,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         confirmPassController.text.toString()) {
       Navigator.pop(context);
 
-      showCustomSnackbar(context, "Passwords do not match.");
+      CustomSnackBar.showError(context, "Passwords do not match");
+      return;
     }
 
     try {
@@ -79,8 +78,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (mounted) Navigator.pop(context);
-
-      showCustomSnackbar(context, e.code);
+      if (e.code == 'weak-password') {
+        CustomSnackBar.showError(context, "The password provided is too weak.");
+      } else if (e.code == 'email-already-in-use') {
+        CustomSnackBar.showError(
+            context, "An account already exists for that email.");
+      } else {
+        CustomSnackBar.showError(
+            context, "An error occurred. Please try again.");
+      }
     }
   }
 
