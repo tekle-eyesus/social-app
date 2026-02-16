@@ -1,60 +1,45 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/screens/chat_screen.dart';
-import 'package:socialapp/widget/comment_sheet.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userEmail;
   final String username;
   final String receiverImageUrl;
-  const UserProfileScreen(
-      {super.key,
-      required this.userEmail,
-      required this.username,
-      required this.receiverImageUrl});
+  const UserProfileScreen({
+    super.key,
+    required this.userEmail,
+    required this.username,
+    required this.receiverImageUrl,
+  });
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  String getChatRoomId(String user1Id, String user2Id) {
-    return user1Id.compareTo(user2Id) < 0
-        ? '$user1Id\_$user2Id'
-        : '$user2Id\_$user1Id';
-  }
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
-  Future<Map<String, dynamic>?> getUserInfo() async {
-    // Fetch user information using the helper function
-    Map<String, dynamic>? userInfo = await fetchCurrentUserInfo();
-    if (userInfo != null) {
-      return userInfo;
-    } else {
-      print("User not found or not logged in.");
-      return null;
-    }
-  }
-
-  String usernameText(String username) {
-    return username[0].toUpperCase() + username.substring(1);
-  }
-
-  Future<void> likePost(String postId, String userId) async {
+  // -- LOGIC: LIKE POST --
+  Future<void> likePost(String postId) async {
+    final String currentEmail = currentUser!.email!;
     final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
+
     DocumentSnapshot postSnapshot = await postRef.get();
+    if (!postSnapshot.exists) return;
+
     List likedBy = postSnapshot['likedBy'] ?? [];
-    if (likedBy.contains(userId)) {
+
+    if (likedBy.contains(currentEmail)) {
       await postRef.update({
-        'likedBy': FieldValue.arrayRemove([userId]),
+        'likedBy': FieldValue.arrayRemove([currentEmail]),
         'likesCount': FieldValue.increment(-1),
       });
     } else {
       await postRef.update({
-        'likedBy': FieldValue.arrayUnion([userId]),
+        'likedBy': FieldValue.arrayUnion([currentEmail]),
         'likesCount': FieldValue.increment(1),
       });
     }
@@ -62,348 +47,446 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue.shade300,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.blue.shade300,
-        actions: [
-          IconButton(
-            onPressed: () {
-              // chat screen
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ChatScreen(
-                    receiverId: widget.userEmail,
-                    receiverName: widget.username,
-                    receiverImageUrl: widget.receiverImageUrl);
-              }));
-            },
-            icon: const FaIcon(
-              FontAwesomeIcons.message,
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade200, Colors.blue.shade100],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: FutureBuilder<Map<String, dynamic>?>(
-          // not important for now
-          future: getUserInfo(),
-          builder: (context, userInfoSnapshot) {
-            if (userInfoSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: Color.fromARGB(255, 14, 57, 92),
-              ));
-            }
-            if (!userInfoSnapshot.hasData) {
-              return const Center(child: Text("User data could not be loaded"));
-            }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final secondaryText = Colors.grey.shade600;
 
-            // Metadata section
-            var userInfo = userInfoSnapshot.data;
-            return StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('posts')
-                  .where('email', isEqualTo: widget.userEmail)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error.toString()));
-                } else if (snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text("No Posts for this user!"));
-                } else if (snapshot.hasData) {
-                  List<DocumentSnapshot> posts = snapshot.data!.docs;
-                  print(posts);
-                  Map<String, dynamic> post =
-                      posts[0].data() as Map<String, dynamic>;
-                  final postUser = post['username'];
-                  final postUserProfession = post['profession'];
-                  final postUserImg = post['profile'];
-                  // Display metadata and posts together
-                  return ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.userEmail)
+            .snapshots(),
+        builder: (context, userSnapshot) {
+          String displayUsername = widget.username;
+          String displayProfilePic = widget.receiverImageUrl;
+          String displayProfession = "User";
+          String displayBio = "";
+
+          if (userSnapshot.hasData && userSnapshot.data!.exists) {
+            final data = userSnapshot.data!.data() as Map<String, dynamic>;
+            displayUsername = data['username'] ?? widget.username;
+            displayProfilePic = data['profilePic'] ?? widget.receiverImageUrl;
+            displayProfession = data['profession'] ?? "User";
+            displayBio = data['about'] ?? "No bio available.";
+          }
+
+          return CustomScrollView(
+            slivers: [
+              // 1. APP BAR (Floating)
+              SliverAppBar(
+                expandedHeight: 120,
+                pinned: true,
+                backgroundColor: bgColor,
+                leading: Container(
+                  margin: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      // Metadata section
-                      Row(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 17, vertical: 6),
-                            clipBehavior: Clip.hardEdge,
-                            width: 137,
-                            height: 190,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
+                      // Header Banner (X Style)
+                      Container(
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(
+                              "https://cdn.mos.cms.futurecdn.net/L8exumuVUaJatGHCPDRuQm.jpg",
                             ),
-                            child: Image.network(
-                              postUserImg ??
-                                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-YIGV8GTRHiW_KACLMhhi9fEq2T5BDQcEyA&s",
-                              fit: BoxFit.cover,
-                            ),
+                            fit: BoxFit.cover,
                           ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 6, right: 2),
-                            height: 200,
-                            width: 200,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ListTile(
-                                  horizontalTitleGap: 0,
-                                  contentPadding: const EdgeInsets.all(0),
-                                  title: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize
-                                        .min, // Minimizes the vertical space
-                                    children: [
-                                      Text(
-                                        usernameText(postUser ?? ""),
-                                        style: const TextStyle(
-                                          fontFamily: 'teko',
-                                          fontSize: 40,
-                                        ),
-                                      ),
-                                      // / Adjust this value to control the spacing
-                                      Text(
-                                        postUserProfession ??
-                                            "Profession not set",
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontFamily: 'roboto',
-                                        ),
-                                      ),
-                                    ],
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.8)
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 2. PROFILE DETAILS HEADER
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Avatar & Action Button Row
+                      Transform.translate(
+                        offset: const Offset(
+                            0, -35), // Move avatar up to overlap banner
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // Profile Pic
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: bgColor, width: 4), // Cutout effect
+                              ),
+                              child: CircleAvatar(
+                                radius: 40,
+                                backgroundColor: Colors.grey.shade200,
+                                backgroundImage:
+                                    NetworkImage(displayProfilePic),
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                bottom: 7,
+                              ),
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return ChatScreen(
+                                      receiverId: widget.userEmail,
+                                      receiverName: displayUsername,
+                                      receiverImageUrl: displayProfilePic,
+                                    );
+                                  }));
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade600,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
                                   ),
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                          color: const Color.fromARGB(
-                                              255, 250, 238, 200),
-                                          borderRadius: BorderRadius.circular(
-                                            5,
-                                          )),
-                                      child: const Icon(Icons.email,
-                                          color: Colors.amber, size: 35),
-                                    ),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                          color: Color.fromARGB(
-                                              255, 250, 210, 200),
-                                          borderRadius: BorderRadius.circular(
-                                            7,
-                                          )),
-                                      child: const Icon(Icons.call,
-                                          color: Colors.red, size: 35),
-                                    ),
-                                    const SizedBox(
-                                      width: 15,
-                                    ),
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                          color: Color.fromARGB(
-                                              255, 213, 200, 250),
-                                          borderRadius: BorderRadius.circular(
-                                            7,
-                                          )),
-                                      child: const Icon(Icons.video_call,
-                                          color: Colors.black, size: 35),
-                                    ),
-                                  ],
+                                child: const FaIcon(FontAwesomeIcons.envelope,
+                                    color: Colors.black, size: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Transform.translate(
+                        offset: const Offset(0, -25),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              displayUsername,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: textColor,
+                              ),
+                            ),
+                            Text(
+                              displayProfession,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: secondaryText,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            // Bio
+                            Text(
+                              displayBio,
+                              style: TextStyle(
+                                fontSize: 15,
+                                height: 1.4,
+                                color: textColor,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            // Meta Data (Joined Date)
+                            Row(
+                              children: [
+                                FaIcon(FontAwesomeIcons.calendar,
+                                    size: 14, color: secondaryText),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "Joined September 2023", // You can store 'joinedAt' in Firebase later
+                                  style: TextStyle(
+                                      color: secondaryText, fontSize: 14),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                      // About Section
-                      const Padding(
-                        padding: EdgeInsets.only(left: 15, bottom: 5, top: 17),
-                        child: Text(
-                          "About",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
+                            const SizedBox(height: 15),
+                            // Followers Count Row (Mockup for X style)
+                            Row(
+                              children: [
+                                _buildCount(textColor, "145", "Following"),
+                                const SizedBox(width: 15),
+                                _buildCount(textColor, "4,321", "Followers"),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Text(userInfo?['about'] ??
-                            "Flutter socila App UI designed by tekle. Connect with them on linkedin; the global community for designers and creative professionals."),
-                      ),
-                      // Posts Section
-                      const Padding(
-                        padding: EdgeInsets.only(left: 15, bottom: 9, top: 17),
-                        child: Text(
-                          "Posts",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      ...posts.map((post) {
-                        Map<String, dynamic> postData =
-                            post.data() as Map<String, dynamic>;
-                        final likeCount = postData['likesCount'] ?? 0;
-                        final commentCount = postData['commentsCount'] ?? 0;
-                        final likedBy = List.from(postData['likedBy'] ?? []);
-                        final userLiked = likedBy
-                            .contains(FirebaseAuth.instance.currentUser!.email);
 
-                        return Container(
-                          height: postData['imageUrl'] != null ? 377 : 180,
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          padding: const EdgeInsets.only(top: 8),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(196, 250, 249, 249),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      // Tabs (Posts / Replies / Media)
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Colors.grey.shade300, width: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            _buildTabItem(textColor, "Posts", true),
+                            _buildTabItem(textColor, "Replies", false),
+                            _buildTabItem(textColor, "Likes", false),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 3. POSTS LIST
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('posts')
+                    .where('email', isEqualTo: widget.userEmail)
+                    // .orderBy('timeStamp', descending: true) // Ensure you have an index for this
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: Center(
                           child: Column(
                             children: [
-                              ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                leading: Container(
-                                  clipBehavior: Clip.hardEdge,
-                                  margin:
-                                      const EdgeInsets.only(left: 5, right: 5),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15)),
-                                  child: Image.network(
-                                    postData['profile'],
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                title: Text(
-                                  usernameText(postData['username'].toString()),
-                                  style: TextStyle(
-                                    color:
-                                        const Color.fromARGB(255, 24, 50, 90),
-                                    fontFamily: "roboto",
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 17,
-                                  ),
-                                ),
-                                subtitle: Row(
-                                  children: [
-                                    // Text(postData["profession"] ?? "No Role"),
-                                    // const Text(" • "),
-                                    Text(timeAgoFromString(
-                                        postData['timeStamp'])),
-                                  ],
-                                ),
-                                trailing: Icon(Icons.more_vert),
+                              Text(
+                                "No posts yet",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor),
                               ),
-                              // Post Content
-
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 18.0,
-                                      vertical: 5,
-                                    ),
-                                    child: Text(postData['content'].toString()),
-                                  ),
-                                ],
-                              ),
-
-                              if (postData["imageUrl"] != null)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Container(
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Image.network(
-                                      postData['imageUrl'],
-                                      height: 200,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              // Like and Comment
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                        userLiked
-                                            ? Icons.favorite
-                                            : Icons.favorite_border,
-                                        color: userLiked
-                                            ? Colors.red
-                                            : Colors.grey),
-                                    onPressed: () async {
-                                      var userInfo = await getUserInfo();
-                                      likePost(post.id, userInfo!['email']);
-                                    },
-                                  ),
-                                  Text('$likeCount likes'),
-                                  IconButton(
-                                    icon: const Icon(FontAwesomeIcons.comment),
-                                    onPressed: () async {
-                                      var userInfo = await getUserInfo();
-                                      showCommentsBottomSheet(context, post.id,
-                                          userInfo: {
-                                            'username': userInfo!['username'],
-                                            'profilePic':
-                                                userInfo['profilePic'],
-                                          });
-                                    },
-                                  ),
-                                  Text('$commentCount comments'),
-                                ],
-                              )
+                              const SizedBox(height: 5),
+                              Text("When they post, it will show up here.",
+                                  style: TextStyle(color: secondaryText)),
                             ],
                           ),
-                        );
-                      }).toList(),
-                    ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  final posts = snapshot.data!.docs;
+
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final postData =
+                            posts[index].data() as Map<String, dynamic>;
+                        final postId = posts[index].id;
+                        final userLiked = (postData['likedBy'] ?? [])
+                            .contains(currentUser?.email);
+
+                        return _buildPostItem(context, postData, postId,
+                            userLiked, isDark, textColor);
+                      },
+                      childCount: posts.length,
+                    ),
                   );
-                }
-                return const Center(child: Text("Something went wrong!"));
-              },
-            );
-          },
-        ),
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // -- WIDGET: Post Item (Re-used clean style) --
+  Widget _buildPostItem(BuildContext context, Map<String, dynamic> data,
+      String postId, bool isLiked, bool isDark, Color textColor) {
+    return Container(
+      decoration: BoxDecoration(
+        border:
+            Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Avatar
+          CircleAvatar(
+            radius: 20,
+            backgroundImage:
+                NetworkImage(data['profile'] ?? widget.receiverImageUrl),
+          ),
+          const SizedBox(width: 12),
+          // Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Name + Username + Time
+                Row(
+                  children: [
+                    Text(
+                      data['username'] ?? "User",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: textColor),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      "@${data['username']?.toString().toLowerCase().replaceAll(" ", "")}",
+                      style:
+                          TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                    ),
+                    const Spacer(),
+                    const Icon(Icons.more_horiz, size: 16, color: Colors.grey),
+                  ],
+                ),
+                const SizedBox(height: 4),
+
+                // Text Content
+                if (data['content'] != null &&
+                    data['content'].toString().isNotEmpty)
+                  Text(
+                    data['content'],
+                    style:
+                        TextStyle(fontSize: 15, height: 1.3, color: textColor),
+                  ),
+
+                // Image Content
+                if (data['imageUrl'] != null) ...[
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      data['imageUrl'],
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+
+                // Action Buttons
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildActionIcon(FontAwesomeIcons.comment,
+                        data['commentsCount']?.toString() ?? "0", false),
+                    InkWell(
+                      onTap: () => likePost(postId),
+                      child: Row(
+                        children: [
+                          Icon(
+                              isLiked
+                                  ? FontAwesomeIcons.solidHeart
+                                  : FontAwesomeIcons.heart,
+                              size: 18,
+                              color: isLiked ? Colors.pink : Colors.grey),
+                          const SizedBox(width: 6),
+                          Text(data['likesCount']?.toString() ?? "0",
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    _buildActionIcon(
+                        FontAwesomeIcons.retweet, "0", false), // Placeholder
+                    _buildActionIcon(FontAwesomeIcons.shareNodes, "", false),
+                  ],
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionIcon(IconData icon, String count, bool active) {
+    return Row(
+      children: [
+        FaIcon(icon, size: 18, color: Colors.grey),
+        if (count.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(count, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        ]
+      ],
+    );
+  }
+
+  Widget _buildCount(Color textColor, String count, String label) {
+    return RichText(
+      text: TextSpan(
+        style:
+            TextStyle(color: textColor, fontFamily: 'roboto'), // Default style
+        children: [
+          TextSpan(
+              text: count, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const TextSpan(text: " "),
+          TextSpan(text: label, style: TextStyle(color: Colors.grey.shade600)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabItem(Color textColor, String label, bool isActive) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 25, bottom: 10),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive ? textColor : Colors.grey,
+            ),
+          ),
+          if (isActive)
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              height: 3,
+              width: 30,
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            )
+        ],
       ),
     );
   }
