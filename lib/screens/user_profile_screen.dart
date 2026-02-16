@@ -76,14 +76,61 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           return CustomScrollView(
             slivers: [
               // 1. APP BAR (Floating)
+              // SliverAppBar(
+              //   expandedHeight: 120,
+              //   pinned: true,
+              //   backgroundColor: bgColor,
+              //   leading: Container(
+              //     margin: const EdgeInsets.all(8),
+              //     decoration: const BoxDecoration(
+              //       color: Colors.black54,
+              //       shape: BoxShape.circle,
+              //     ),
+              //     child: IconButton(
+              //       icon: const Icon(Icons.arrow_back, color: Colors.white),
+              //       onPressed: () => Navigator.pop(context),
+              //     ),
+              //   ),
+              //   flexibleSpace: FlexibleSpaceBar(
+              //     background: Stack(
+              //       fit: StackFit.expand,
+              //       children: [
+              //         // Header Banner (X Style)
+              //         Container(
+              //           decoration: const BoxDecoration(
+              //             image: DecorationImage(
+              //               image: NetworkImage(
+              //                 "https://cdn.mos.cms.futurecdn.net/L8exumuVUaJatGHCPDRuQm.jpg",
+              //               ),
+              //               fit: BoxFit.cover,
+              //             ),
+              //           ),
+              //         ),
+              //         Container(
+              //           decoration: BoxDecoration(
+              //             gradient: LinearGradient(
+              //               begin: Alignment.topCenter,
+              //               end: Alignment.bottomCenter,
+              //               colors: [
+              //                 Colors.transparent,
+              //                 Colors.black.withOpacity(0.8)
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
               SliverAppBar(
-                expandedHeight: 120,
-                pinned: true,
-                backgroundColor: bgColor,
+                expandedHeight: 0, // No height needed for banner here
+                pinned: true, // Keeps back button visible
+                backgroundColor: bgColor, // Matches background or transparent
+                elevation: 0,
                 leading: Container(
                   margin: const EdgeInsets.all(8),
                   decoration: const BoxDecoration(
-                    color: Colors.black54,
+                    color: Colors.black54, // Dark circle for visibility
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -91,177 +138,315 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      // Header Banner (X Style)
-                      Container(
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              "https://cdn.mos.cms.futurecdn.net/L8exumuVUaJatGHCPDRuQm.jpg",
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.8)
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ),
 
               // 2. PROFILE DETAILS HEADER
+              // SliverToBoxAdapter(
+              //   child: Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: 16),
+              //     child: Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         // Avatar & Action Button Row
+              //         Transform.translate(
+              //           offset: const Offset(
+              //               0, -35), // Move avatar up to overlap banner
+              //           child: Row(
+              //             crossAxisAlignment: CrossAxisAlignment.end,
+              //             children: [
+              //               // Profile Pic
+              //               Container(
+              //                 decoration: BoxDecoration(
+              //                   shape: BoxShape.circle,
+              //                   border: Border.all(
+              //                       color: bgColor, width: 4), // Cutout effect
+              //                 ),
+              //                 child: CircleAvatar(
+              //                   radius: 40,
+              //                   backgroundColor: Colors.grey.shade200,
+              //                   backgroundImage:
+              //                       NetworkImage(displayProfilePic),
+              //                 ),
+              //               ),
+              //               const Spacer(),
+              //               Container(
+              //                 margin: const EdgeInsets.only(
+              //                   bottom: 7,
+              //                 ),
+              //                 child: OutlinedButton(
+              //                   onPressed: () {
+              //                     Navigator.push(context,
+              //                         MaterialPageRoute(builder: (context) {
+              //                       return ChatScreen(
+              //                         receiverId: widget.userEmail,
+              //                         receiverName: displayUsername,
+              //                         receiverImageUrl: displayProfilePic,
+              //                       );
+              //                     }));
+              //                   },
+              //                   style: OutlinedButton.styleFrom(
+              //                     side: BorderSide(
+              //                       color: isDark
+              //                           ? Colors.grey.shade700
+              //                           : Colors.grey.shade600,
+              //                     ),
+              //                     shape: RoundedRectangleBorder(
+              //                         borderRadius: BorderRadius.circular(20)),
+              //                     padding: const EdgeInsets.symmetric(
+              //                       horizontal: 12,
+              //                     ),
+              //                   ),
+              //                   child: const FaIcon(FontAwesomeIcons.envelope,
+              //                       color: Colors.black, size: 16),
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+
+              //         Transform.translate(
+              //           offset: const Offset(0, -25),
+              //           child: Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               Text(
+              //                 displayUsername,
+              //                 style: TextStyle(
+              //                   fontSize: 22,
+              //                   fontWeight: FontWeight.w900,
+              //                   color: textColor,
+              //                 ),
+              //               ),
+              //               Text(
+              //                 displayProfession,
+              //                 style: TextStyle(
+              //                   fontSize: 14,
+              //                   color: secondaryText,
+              //                 ),
+              //               ),
+              //               const SizedBox(height: 12),
+              //               // Bio
+              //               Text(
+              //                 displayBio,
+              //                 style: TextStyle(
+              //                   fontSize: 15,
+              //                   height: 1.4,
+              //                   color: textColor,
+              //                 ),
+              //               ),
+              //               const SizedBox(height: 12),
+              //               // Meta Data (Joined Date)
+              //               Row(
+              //                 children: [
+              //                   FaIcon(FontAwesomeIcons.calendar,
+              //                       size: 14, color: secondaryText),
+              //                   const SizedBox(width: 5),
+              //                   Text(
+              //                     "Joined September 2023", // You can store 'joinedAt' in Firebase later
+              //                     style: TextStyle(
+              //                         color: secondaryText, fontSize: 14),
+              //                   ),
+              //                 ],
+              //               ),
+              //               const SizedBox(height: 15),
+              //               // Followers Count Row (Mockup for X style)
+              //               Row(
+              //                 children: [
+              //                   _buildCount(textColor, "145", "Following"),
+              //                   const SizedBox(width: 15),
+              //                   _buildCount(textColor, "4,321", "Followers"),
+              //                 ],
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+
+              //         // Tabs (Posts / Replies / Media)
+              //         const SizedBox(height: 10),
+              //         Container(
+              //           decoration: BoxDecoration(
+              //             border: Border(
+              //                 bottom: BorderSide(
+              //                     color: Colors.grey.shade300, width: 0.5)),
+              //           ),
+              //           child: Row(
+              //             children: [
+              //               _buildTabItem(textColor, "Posts", true),
+              //               _buildTabItem(textColor, "Replies", false),
+              //               _buildTabItem(textColor, "Likes", false),
+              //             ],
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+
+              // 2. HEADER + AVATAR + DETAILS (Combined in one Adapter)
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Avatar & Action Button Row
-                      Transform.translate(
-                        offset: const Offset(
-                            0, -35), // Move avatar up to overlap banner
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // Profile Pic
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: bgColor, width: 4), // Cutout effect
+                child: Column(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.bottomLeft,
+                      children: [
+                        Container(
+                          height: 150,
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                "https://cdn.mos.cms.futurecdn.net/L8exumuVUaJatGHCPDRuQm.jpg",
                               ),
-                              child: CircleAvatar(
-                                radius: 40,
-                                backgroundColor: Colors.grey.shade200,
-                                backgroundImage:
-                                    NetworkImage(displayProfilePic),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.8)
+                                ],
                               ),
                             ),
-                            const Spacer(),
-                            Container(
-                              margin: const EdgeInsets.only(
-                                bottom: 7,
-                              ),
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return ChatScreen(
-                                      receiverId: widget.userEmail,
-                                      receiverName: displayUsername,
-                                      receiverImageUrl: displayProfilePic,
-                                    );
-                                  }));
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                    color: isDark
-                                        ? Colors.grey.shade700
-                                        : Colors.grey.shade600,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                ),
-                                child: const FaIcon(FontAwesomeIcons.envelope,
-                                    color: Colors.black, size: 16),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
 
-                      Transform.translate(
-                        offset: const Offset(0, -25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              displayUsername,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                color: textColor,
-                              ),
+                        Positioned(
+                          bottom: -40,
+                          left: 16,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: bgColor, width: 4),
                             ),
-                            Text(
-                              displayProfession,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: secondaryText,
-                              ),
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: NetworkImage(displayProfilePic),
                             ),
-                            const SizedBox(height: 12),
-                            // Bio
-                            Text(
-                              displayBio,
-                              style: TextStyle(
-                                fontSize: 15,
-                                height: 1.4,
-                                color: textColor,
+                          ),
+                        ),
+                        // Action Button (Message)
+                        Positioned(
+                          bottom: -2,
+                          right: 16,
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 40),
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return ChatScreen(
+                                        receiverId: widget.userEmail,
+                                        receiverName: displayUsername,
+                                        receiverImageUrl: displayProfilePic,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey.shade600
+                                        : Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
                               ),
+                              child: const FaIcon(FontAwesomeIcons.envelope,
+                                  size: 16),
                             ),
-                            const SizedBox(height: 12),
-                            // Meta Data (Joined Date)
-                            Row(
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Spacer to account for the Avatar hanging down (-40)
+                    const SizedBox(height: 45),
+
+                    // 3. USER INFO (Name, Bio, etc.)
+                    Transform.translate(
+                      offset: const Offset(18, 0), // Move up to reduce gap
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayUsername,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              color: textColor,
+                            ),
+                          ),
+                          Text(
+                            displayProfession,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: secondaryText,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Bio
+                          Text(
+                            displayBio,
+                            style: TextStyle(
+                              fontSize: 15,
+                              height: 1.4,
+                              color: textColor,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Meta Data (Joined Date)
+                          Row(
+                            children: [
+                              FaIcon(FontAwesomeIcons.calendar,
+                                  size: 14, color: secondaryText),
+                              const SizedBox(width: 5),
+                              Text(
+                                "Joined September 2023", // You can store 'joinedAt' in Firebase later
+                                style: TextStyle(
+                                    color: secondaryText, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          // Followers Count Row (Mockup for X style)
+                          Row(
+                            children: [
+                              _buildCount(textColor, "145", "Following"),
+                              const SizedBox(width: 15),
+                              _buildCount(textColor, "4,321", "Followers"),
+                            ],
+                          ),
+                          //  Tabs (Posts / Replies / Media)
+                          const SizedBox(height: 12),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.grey.shade300, width: 0.5)),
+                            ),
+                            child: Row(
                               children: [
-                                FaIcon(FontAwesomeIcons.calendar,
-                                    size: 14, color: secondaryText),
-                                const SizedBox(width: 5),
-                                Text(
-                                  "Joined September 2023", // You can store 'joinedAt' in Firebase later
-                                  style: TextStyle(
-                                      color: secondaryText, fontSize: 14),
-                                ),
+                                _buildTabItem(textColor, "Posts", true),
+                                _buildTabItem(textColor, "Replies", false),
+                                _buildTabItem(textColor, "Likes", false),
                               ],
                             ),
-                            const SizedBox(height: 15),
-                            // Followers Count Row (Mockup for X style)
-                            Row(
-                              children: [
-                                _buildCount(textColor, "145", "Following"),
-                                const SizedBox(width: 15),
-                                _buildCount(textColor, "4,321", "Followers"),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-
-                      // Tabs (Posts / Replies / Media)
-                      const SizedBox(height: 10),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                                  color: Colors.grey.shade300, width: 0.5)),
-                        ),
-                        child: Row(
-                          children: [
-                            _buildTabItem(textColor, "Posts", true),
-                            _buildTabItem(textColor, "Replies", false),
-                            _buildTabItem(textColor, "Likes", false),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 
