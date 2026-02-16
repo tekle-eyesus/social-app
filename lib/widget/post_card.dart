@@ -295,7 +295,7 @@ class _PostItemState extends State<PostItem> {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return AiSummary(
+                          return AiSummaryScreen(
                             postContent: content,
                             imageUrl: hasImage ? postData['imageUrl'] : null,
                           );

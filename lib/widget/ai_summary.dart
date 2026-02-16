@@ -1,112 +1,142 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:socialapp/services/gemini_chat_service.dart';
 
-class AiSummary extends StatelessWidget {
-  String? imageUrl;
-  String postContent;
-  AiSummary({super.key, required this.postContent, this.imageUrl});
+class AiSummaryScreen extends StatefulWidget {
+  final String postContent;
+  final String? imageUrl;
+
+  const AiSummaryScreen({super.key, required this.postContent, this.imageUrl});
+
+  @override
+  State<AiSummaryScreen> createState() => _AiSummaryScreenState();
+}
+
+class _AiSummaryScreenState extends State<AiSummaryScreen> {
+  late Future<String> _summaryFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final GeminiChatService _geminiService = GeminiChatService();
+    _summaryFuture = _geminiService.getPostSummary(
+      postContent: widget.postContent,
+      imageUrl: widget.imageUrl,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final GeminiChatService _geminiService = GeminiChatService();
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context)
-            .scaffoldBackgroundColor, // Adapts to Dark/Light mode
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final textColor = isDark ? Colors.white : Colors.black;
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: bgColor,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.close, color: textColor),
+          onPressed: () => Navigator.pop(context),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            spreadRadius: 2,
-          )
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // --- Handle Bar ---
-          Center(
-            child: Container(
-              width: 40,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(10),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              "assets/images/modelicon.png",
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "AI Summary",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'poppins',
+                color: textColor,
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-
-          // --- Header ---
-          Row(
-            children: [
-              Image.asset(
-                "assets/images/modelicon.png",
-                width: 24,
-                height: 24,
+          ],
+        ),
+      ),
+      body: FutureBuilder<String>(
+        future: _summaryFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: Colors.blueAccent,
+                    strokeWidth: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Reading post...",
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 16,
+                    ),
+                  )
+                ],
               ),
-              const SizedBox(width: 10),
-              const Text(
-                "AI Summary",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'poppins',
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 50, color: Colors.redAccent),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Failed to analyze post.",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      snapshot.error.toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          const Divider(height: 30),
-
-          // --- Content (Future Builder) ---
-          Expanded(
-            child: FutureBuilder<String>(
-              future: _geminiService.getPostSummary(
-                postContent: postContent,
-                imageUrl: imageUrl,
+            );
+          } else if (snapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              child: Markdown(
+                data: snapshot.data!,
+                selectable: true,
+                padding: const EdgeInsets.all(20),
+                styleSheet: MarkdownStyleSheet(
+                  p: TextStyle(
+                    fontSize: 16,
+                    height: 1.6,
+                    fontFamily: 'roboto',
+                    color: textColor,
+                  ),
+                  strong: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
+                  ),
+                  h1: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                  h2: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                  listBullet: TextStyle(color: textColor),
+                ),
               ),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(color: Colors.blueAccent),
-                        SizedBox(height: 15),
-                        Text(
-                          "Analyzing post...",
-                          style: TextStyle(color: Colors.grey),
-                        )
-                      ],
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return const Center(
-                    child: Text(
-                      "Failed to load summary.",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  );
-                } else if (snapshot.hasData) {
-                  return Text(
-                    snapshot.data!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                      fontFamily: 'roboto',
-                    ),
-                  );
-                }
-                return const SizedBox();
-              },
-            ),
-          ),
-        ],
+            );
+          }
+          return const SizedBox();
+        },
       ),
     );
   }
