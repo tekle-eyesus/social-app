@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/post_card.dart';
 import 'package:socialapp/widget/post_shimmer.dart';
@@ -15,76 +15,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController postMessageController = TextEditingController();
-//to handle user posting
-  void handlePost() async {
-    User? loggedUser = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    if (postMessageController.text.isNotEmpty) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primaryColor,
-              ),
-            );
-          });
-//what about
-      await db.collection("posts").doc().set({
-        "content": postMessageController.text,
-        "email": loggedUser!.email,
-        "timeStamp": DateTime.now().toIso8601String(),
-      });
-      Navigator.pop(context);
-      postMessageController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        width: 200,
-        duration: const Duration(seconds: 1),
-        content: Container(
-          alignment: Alignment.center,
-          margin: const EdgeInsets.only(bottom: 70),
-          height: 44,
-          decoration: BoxDecoration(
-              color: Colors.deepPurple.shade200,
-              borderRadius: BorderRadius.circular(12)),
-          child: Text(
-            "POSTED !!!",
-            style: TextStyle(
-                color: Colors.deepPurple.shade600, fontFamily: 'poppins'),
-          ),
-        ),
-        behavior: SnackBarBehavior.floating,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        width: 200,
-        duration: Duration(seconds: 1),
-        content: Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.only(bottom: 70),
-          height: 44,
-          decoration: BoxDecoration(
-              color: Colors.deepPurple.shade200,
-              borderRadius: BorderRadius.circular(12)),
-          child: Text(
-            "Say something!!",
-            style: TextStyle(
-                color: Colors.deepPurple.shade600, fontFamily: 'poppins'),
-          ),
-        ),
-        behavior: SnackBarBehavior.floating,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ));
-    }
-  }
-
+  Map<String, dynamic>? currentUserData;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _loadCurrentUserData();
+  }
+
+  void _loadCurrentUserData() async {
+    Map<String, dynamic>? userData = await fetchCurrentUserInfo();
+    setState(() {
+      currentUserData = userData;
+    });
   }
 
   @override
@@ -102,14 +44,16 @@ class _HomeScreenState extends State<HomeScreen> {
               leadingWidth: 46,
               foregroundColor: AppColors.primaryText,
               backgroundColor: AppColors.surface,
-              leading: const Row(
+              leading: Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 6,
                   ),
                   CircleAvatar(
                     backgroundImage: NetworkImage(
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUyllrW-u-01_B8qMki4ybHzbhuBWhUq3pMA&s"),
+                      currentUserData?['profilePic'] ??
+                          'https://www.pngall.com/wp-content/uploads/5/Profile-PNG-High-Quality-Image.png',
+                    ),
                   ),
                 ],
               ),
