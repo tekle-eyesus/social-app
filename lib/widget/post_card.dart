@@ -273,18 +273,6 @@ class _PostItemState extends State<PostItem> {
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w500)),
                 const SizedBox(width: 15),
-                IconButton(
-                  onPressed: () {
-                    // share logic here
-                  },
-                  icon: const FaIcon(FontAwesomeIcons.share,
-                      size: 20, color: Colors.grey),
-                ),
-                const Text(
-                  '1212',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                ),
                 const Spacer(),
                 // Inside your PostCard or Widget build method
 
