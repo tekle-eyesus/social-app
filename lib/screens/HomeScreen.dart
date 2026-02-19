@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connect_guard/connect_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/post_card.dart';
 import 'package:socialapp/widget/post_shimmer.dart';
@@ -33,105 +35,129 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: NestedScrollView(
-        floatHeaderSlivers: true,
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              centerTitle: true,
-              leadingWidth: 46,
-              foregroundColor: AppColors.primaryText,
-              backgroundColor: AppColors.surface,
-              leading: Row(
-                children: [
-                  const SizedBox(
-                    width: 6,
+      body: ConnectGuard(
+        builder: (context) {
+          return NestedScrollView(
+            floatHeaderSlivers: true,
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  centerTitle: true,
+                  leadingWidth: 46,
+                  foregroundColor: AppColors.primaryText,
+                  backgroundColor: AppColors.surface,
+                  leading: Row(
+                    children: [
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          currentUserData?['profilePic'] ??
+                              'https://www.pngall.com/wp-content/uploads/5/Profile-PNG-High-Quality-Image.png',
+                        ),
+                      ),
+                    ],
                   ),
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      currentUserData?['profilePic'] ??
-                          'https://www.pngall.com/wp-content/uploads/5/Profile-PNG-High-Quality-Image.png',
+                  title: const Text(
+                    "Feed",
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 21, 45, 81)),
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const FaIcon(
+                        FontAwesomeIcons.search,
+                        size: 25,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        print("search logic here");
+                      },
                     ),
-                  ),
-                ],
-              ),
-              title: const Text(
-                "Feed",
-                style: TextStyle(
-                    fontSize: 22,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 21, 45, 81)),
-              ),
-              actions: [
-                IconButton(
-                  icon: const FaIcon(
-                    FontAwesomeIcons.search,
-                    size: 25,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    print("search logic here");
-                  },
+                    const SizedBox(
+                      width: 6,
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  width: 6,
+              ];
+            },
+            body: Column(
+              children: [
+                Expanded(
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("posts")
+                        .orderBy('timeStamp', descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const PostShimmerLoading();
+                      } else if (snapshot.hasError) {
+                        return Text(snapshot.error.toString());
+                      } else if (snapshot.data!.docs.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "No Post Available",
+                            style: TextStyle(
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      } else if (snapshot.hasData) {
+                        List<DocumentSnapshot> posts = snapshot.data!.docs;
+
+                        return ListView.builder(
+                          padding: const EdgeInsets.only(top: 8, bottom: 67),
+                          itemCount: posts.length,
+                          itemBuilder: ((context, index) {
+                            // Get the data
+                            Map<String, dynamic> postData =
+                                posts[index].data() as Map<String, dynamic>;
+                            String docId = posts[index].id;
+
+                            return PostItem(
+                              postData: postData,
+                              docId: docId,
+                              index: index,
+                            );
+                          }),
+                        );
+                      } else {
+                        return Text("no data exist");
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
-          ];
+          );
         },
-        body: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("posts")
-                    .orderBy('timeStamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const PostShimmerLoading();
-                  } else if (snapshot.hasError) {
-                    return Text(snapshot.error.toString());
-                  } else if (snapshot.data!.docs.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "No Post Available",
-                        style: TextStyle(
-                            color: Colors.blue.shade900,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  } else if (snapshot.hasData) {
-                    List<DocumentSnapshot> posts = snapshot.data!.docs;
-
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(top: 8, bottom: 67),
-                      itemCount: posts.length,
-                      itemBuilder: ((context, index) {
-                        // Get the data
-                        Map<String, dynamic> postData =
-                            posts[index].data() as Map<String, dynamic>;
-                        String docId = posts[index].id;
-
-                        return PostItem(
-                          postData: postData,
-                          docId: docId,
-                          index: index,
-                        );
-                      }),
-                    );
-                  } else {
-                    return Text("no data exist");
-                  }
-                },
-              ),
+        onConnectivityChanged: (isOnline) {
+          isOnline
+              ? CustomSnackBar.showSuccess(context, "Back Online!")
+              : CustomSnackBar.showError(context, "Lost Connection!");
+        },
+        offlineBuilder: (context) {
+          return Container(
+            color: Colors.red.shade50,
+            width: double.infinity,
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.wifi_off, size: 100, color: Colors.red),
+                SizedBox(height: 20),
+                Text("No Internet Connection", style: TextStyle(fontSize: 24)),
+                Text("Please check your settings."),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
