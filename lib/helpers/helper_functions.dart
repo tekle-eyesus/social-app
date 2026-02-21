@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 void DisplayErrorMessage(String message, BuildContext context) {
   showDialog(
@@ -99,4 +100,10 @@ Future<Map<String, dynamic>?> fetchUserDataById(String userId) async {
 
 String usernameText(String username) {
   return username[0].toUpperCase() + username.substring(1);
+}
+
+String formatTimestamp(Timestamp? timestamp) {
+  if (timestamp == null) return "Now";
+  DateTime date = timestamp.toDate();
+  return DateFormat('hh:mm a').format(date);
 }
