@@ -362,7 +362,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.black))
                   : Container(
-                      // ... existing decoration ...
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
                       child: const Icon(Icons.arrow_upward,
                           color: Colors.white, size: 20),
                     ),
