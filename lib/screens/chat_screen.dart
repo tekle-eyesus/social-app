@@ -3,6 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
+import 'package:socialapp/widget/full_screen_image.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ChatScreen extends StatefulWidget {
   final String receiverId;
@@ -28,6 +33,62 @@ class _ChatScreenState extends State<ChatScreen> {
 
   late String currentUserId;
   late String roomId;
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
+
+  final cloudinary = CloudinaryPublic(
+    dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '',
+    dotenv.env['CLOUDINARY_UPLOAD_PRESET'] ?? '',
+    cache: false,
+  );
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 70,
+      );
+
+      if (pickedFile == null) return;
+
+      setState(() => _isUploading = true);
+
+      CloudinaryResponse response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(pickedFile.path,
+            resourceType: CloudinaryResourceType.Image),
+      );
+
+      await _sendMessage(imageUrl: response.secureUrl, type: 'image');
+    } catch (e) {
+      CustomSnackBar.showError(context, "Failed to upload image: $e");
+    } finally {
+      setState(() => _isUploading = false);
+    }
+  }
+
+  Future<void> _sendMessage(
+      {String? text, String? imageUrl, String type = 'text'}) async {
+    if (type == 'text' && (text == null || text.trim().isEmpty)) return;
+
+    if (type == 'text') _controller.clear();
+
+    await _firestore
+        .collection('chats')
+        .doc(roomId)
+        .collection('messages')
+        .add({
+      'text': text ?? '',
+      'imageUrl': imageUrl ?? '',
+      'type': type, // 'text' or 'image'
+      'senderId': currentUserId,
+      'receiverId': widget.receiverId,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(0,
+          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    }
+  }
 
   @override
   void initState() {
@@ -40,30 +101,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return userId1.compareTo(userId2) < 0
         ? "${userId1}_$userId2"
         : "${userId2}_$userId1";
-  }
-
-  Future<void> _sendMessage() async {
-    if (_controller.text.trim().isEmpty) return;
-
-    final messageText = _controller.text.trim();
-    _controller.clear(); // Clear immediately for UX
-
-    await _firestore
-        .collection('chats')
-        .doc(roomId)
-        .collection('messages')
-        .add({
-      'text': messageText,
-      'senderId': currentUserId,
-      'receiverId': widget.receiverId,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-
-    // Scroll to bottom after sending
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-    }
   }
 
   @override
@@ -172,6 +209,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildMessageBubble(Map<String, dynamic> message, bool isSentByMe) {
+    final String type = message['type'] ?? 'text';
+    final String text = message['text'] ?? '';
+    final String imageUrl = message['imageUrl'] ?? '';
+
     return Align(
       alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -190,29 +231,58 @@ class _ChatScreenState extends State<ChatScreen> {
                 ? const Radius.circular(2)
                 : const Radius.circular(16),
           ),
-          boxShadow: [
-            if (!isSentByMe)
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 3,
-                offset: const Offset(0, 1),
-              )
-          ],
+          // ... shadow logic ...
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 12, vertical: 12), // Adjusted padding
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.end, // Aligns timestamp to the end of bubble
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              message['text'] ?? '',
-              style: TextStyle(
-                fontSize: 15,
-                height: 1.4,
-                color: isSentByMe ? Colors.white : Colors.black87,
+            // --- DISPLAY LOGIC ---
+            if (type == 'image')
+              GestureDetector(
+                onTap: () {
+                  // Optional: Open full screen image
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => FullScreenImage(
+                              imageFile: imageUrl, tag: imageUrl)));
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200,
+                        width: 200,
+                        color: Colors.grey.shade800,
+                        child: const Center(
+                            child:
+                                CircularProgressIndicator(color: Colors.white)),
+                      );
+                    },
+                  ),
+                ),
+              )
+            else
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.4,
+                  color: isSentByMe ? Colors.white : Colors.black87,
+                ),
               ),
-            ),
+
             const SizedBox(height: 4),
+
+            // --- TIMESTAMP ---
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -225,11 +295,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 if (isSentByMe) ...[
                   const SizedBox(width: 4),
-                  const Icon(
-                    Icons.done_all,
-                    size: 14,
-                    color: Colors.white70,
-                  ),
+                  const Icon(Icons.done_all, size: 14, color: Colors.white70),
                 ]
               ],
             ),
@@ -250,9 +316,20 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Row(
           children: [
             IconButton(
-              icon: const FaIcon(FontAwesomeIcons.plus, size: 20),
-              color: Colors.grey,
-              onPressed: () {},
+              icon: const FaIcon(FontAwesomeIcons.paperclip,
+                  size: 20, color: Colors.grey),
+              onPressed: _isUploading
+                  ? null
+                  : () => _pickAndUploadImage(ImageSource.gallery),
+            ),
+
+// 2. Update the Camera Icon
+            IconButton(
+              icon: const FaIcon(FontAwesomeIcons.camera,
+                  size: 20, color: Colors.grey),
+              onPressed: _isUploading
+                  ? null
+                  : () => _pickAndUploadImage(ImageSource.camera),
             ),
             Expanded(
               child: Container(
@@ -276,17 +353,19 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: _sendMessage,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Colors.black, // Brand color
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_upward,
-                    color: Colors.white, size: 20),
-              ),
+              onTap: () =>
+                  _sendMessage(text: _controller.text.trim(), type: 'text'),
+              child: _isUploading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.black))
+                  : Container(
+                      // ... existing decoration ...
+                      child: const Icon(Icons.arrow_upward,
+                          color: Colors.white, size: 20),
+                    ),
             ),
           ],
         ),
