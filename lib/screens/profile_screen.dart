@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/favorite_post_grid.dart';
 import 'package:socialapp/widget/post_grid_view.dart';
@@ -42,49 +41,50 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: bgColor,
-        title: Text(
-          "Profile",
-          style: TextStyle(
-            color: textColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: handleSignOut,
-            icon: FaIcon(
-              Icons.logout_rounded,
-              color: Colors.red.shade400,
-            ),
-          ),
-        ],
-      ),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: fetchCurrentUserInfo(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           } else if (snapshot.hasData) {
             Map<String, dynamic> data = snapshot.data!;
-            return Column(
-              children: [
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Profile Picture with Shadow/Border
-                      Container(
-                        decoration: BoxDecoration(
+
+            return NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  backgroundColor: bgColor,
+                  elevation: 0,
+                  title: Text(
+                    "Profile",
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  centerTitle: true,
+                  actions: [
+                    IconButton(
+                      onPressed: handleSignOut,
+                      icon: Icon(Icons.logout_rounded,
+                          color: Colors.red.shade400),
+                    ),
+                  ],
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+
+                        // Profile Picture
+                        Container(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.grey.shade200,
@@ -95,132 +95,133 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 color: Colors.black.withOpacity(0.1),
                                 blurRadius: 10,
                                 spreadRadius: 2,
-                              )
-                            ]),
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: NetworkImage(data["profilePic"]),
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: NetworkImage(data["profilePic"]),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
-                      // Name
-                      Text(
-                        data['username'],
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          color: textColor,
-                          letterSpacing: 0.5,
+                        // Name
+                        Text(
+                          data['username'],
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: textColor,
+                            letterSpacing: 0.5,
+                          ),
                         ),
-                      ),
 
-                      // Email / Handle
-                      Text(
-                        data['email'],
-                        style: TextStyle(
+                        // Email
+                        Text(
+                          data['email'],
+                          style: TextStyle(
                             fontSize: 14,
                             color: secondaryText,
-                            fontWeight: FontWeight.w500),
-                      ),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildStatItem("Likes", "13", isDark),
-                          Container(
+                        // Stats Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildStatItem("Likes", "13", isDark),
+                            Container(
                               height: 25,
                               width: 1,
                               color: Colors.grey.shade300,
                               margin:
-                                  const EdgeInsets.symmetric(horizontal: 25)),
-                          _buildStatItem("Rating", "4.8", isDark),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDark
-                                    ? Colors.grey.shade800
-                                    : Colors.black,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              child: const Text("Edit Profile",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                                  const EdgeInsets.symmetric(horizontal: 25),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () {},
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: textColor,
-                                side: BorderSide(color: Colors.grey.shade300),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                            _buildStatItem("Rating", "4.8", isDark),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Buttons Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isDark
+                                      ? Colors.grey.shade800
+                                      : Colors.black,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: const Text("Edit Profile",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
                               ),
-                              child: const Text("Share",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {},
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: textColor,
+                                  side: BorderSide(color: Colors.grey.shade300),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: const Text("Share",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
-                // --- TAB BAR ---
-                Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(color: Colors.grey.shade200))),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicatorColor: textColor,
-                    indicatorWeight: 2,
-                    labelColor: textColor,
-                    unselectedLabelColor: Colors.grey,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    tabs: const [
-                      Tab(
-                          icon: Icon(Icons.grid_on_rounded,
-                              size: 26)), // Instagram style Grid icon
-                      Tab(icon: Icon(Icons.favorite_border_rounded, size: 26)),
-                    ],
-                  ),
-                ),
-
-                // --- CONTENT ---
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      PostGridView(),
-                      const FavoriteGridView(),
-                    ],
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _StickyTabBarDelegate(
+                    TabBar(
+                      controller: _tabController,
+                      indicatorColor: textColor,
+                      indicatorWeight: 2,
+                      labelColor: textColor,
+                      unselectedLabelColor: Colors.grey,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      tabs: const [
+                        Tab(icon: Icon(Icons.grid_on_rounded, size: 26)),
+                        Tab(
+                            icon:
+                                Icon(Icons.favorite_border_rounded, size: 26)),
+                      ],
+                    ),
+                    bgColor: bgColor,
                   ),
                 ),
               ],
+              body: TabBarView(
+                controller: _tabController,
+                children: [
+                  PostGridView(),
+                  const FavoriteGridView(),
+                ],
+              ),
             );
           } else {
             return const Center(child: Text("Something went wrong"));
@@ -230,7 +231,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // Helper widget for stats to keep code clean
   Widget _buildStatItem(String label, String count, bool isDark) {
     return Column(
       children: [
@@ -244,12 +244,34 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey.shade500,
-          ),
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
         ),
       ],
     );
   }
+}
+
+class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  final Color bgColor;
+
+  _StickyTabBarDelegate(this.tabBar, {required this.bgColor});
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: bgColor,
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_StickyTabBarDelegate oldDelegate) => false;
 }
