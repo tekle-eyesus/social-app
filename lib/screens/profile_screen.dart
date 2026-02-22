@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
-import 'package:socialapp/widget/full_screen_image.dart';
-import 'package:socialapp/widget/post_card.dart';
-import 'package:socialapp/widget/post_shimmer.dart';
+import 'package:socialapp/widget/favorite_post_grid.dart';
+import 'package:socialapp/widget/post_grid_view.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -218,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     controller: _tabController,
                     children: [
                       PostGridView(),
-                      FavoriteGridView(),
+                      const FavoriteGridView(),
                     ],
                   ),
                 ),
@@ -252,125 +250,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
         ),
       ],
-    );
-  }
-}
-
-class PostGridView extends StatelessWidget {
-  final User? u = FirebaseAuth.instance.currentUser;
-
-  PostGridView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection("posts")
-          .where(
-            'email',
-            isEqualTo: u!.email.toString(),
-          )
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const PostShimmerLoading();
-        } else if (snapshot.hasError) {
-          return Center(child: Text(snapshot.error.toString()));
-        } else if (snapshot.data!.docs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FaIcon(FontAwesomeIcons.camera,
-                    size: 50, color: Colors.grey.shade300),
-                const SizedBox(height: 10),
-                Text("No Posts Yet",
-                    style: TextStyle(color: Colors.grey.shade500)),
-              ],
-            ),
-          );
-        } else if (snapshot.hasData) {
-          List<DocumentSnapshot> posts = snapshot.data!.docs;
-
-          return ListView.separated(
-            padding: const EdgeInsets.only(top: 10, bottom: 20),
-            itemCount: posts.length,
-            separatorBuilder: (ctx, i) => const Divider(
-                height: 30,
-                thickness: 8,
-                color: Color(0xFFF5F5F5)), // Divider between posts
-            itemBuilder: (context, index) {
-              Map<String, dynamic> postData =
-                  posts[index].data() as Map<String, dynamic>;
-              String docId = posts[index].id;
-              return PostItem(
-                postData: postData,
-                docId: docId,
-                index: index,
-              );
-            },
-          );
-        }
-        return const Center(child: Text("Something went wrong!!"));
-      },
-    );
-  }
-}
-
-class FavoriteGridView extends StatelessWidget {
-  const FavoriteGridView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(2),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 1,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 2,
-      ),
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        return Container(
-          color: Colors.grey.shade300,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Placeholder image logic
-              InkWell(
-                onTap: () {
-                  // full screen image view ( for now)
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return FullScreenImage(
-                        tag: "$index",
-                        imageFile: "https://picsum.photos/500?random=$index",
-                      );
-                    }),
-                  );
-                },
-                // random images from picsum for demo purposes
-                child: Image.network(
-                  "https://picsum.photos/200?random=$index",
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(Icons.image, color: Colors.white),
-                  ),
-                ),
-              ),
-              // Overlay icon
-              const Align(
-                alignment: Alignment.center,
-                child: Icon(Icons.play_arrow_rounded,
-                    color: Colors.white, size: 30),
-              )
-            ],
-          ),
-        );
-      },
     );
   }
 }
