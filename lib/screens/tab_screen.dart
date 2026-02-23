@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/features/feed/screens/feed_screen.dart';
 import 'package:socialapp/screens/HomeScreen.dart';
 import 'package:socialapp/screens/notify_screen.dart';
-import 'package:socialapp/screens/post_screen.dart';
 import 'package:socialapp/screens/profile_screen.dart';
 import 'package:socialapp/screens/users_screen.dart';
 
@@ -20,7 +19,6 @@ class _TabScreenState extends State<TabScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const UsersScreen(),
-    PostScreen(),
     FeedScreen(),
     const NotifyScreen(),
     const ProfileScreen(),
@@ -69,51 +67,28 @@ class _TabScreenState extends State<TabScreen> {
           showSelectedLabels: false, // X style: hide labels
           showUnselectedLabels: false,
           elevation: 0,
-          items: [
-            const BottomNavigationBarItem(
+          items: const [
+            BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.house, size: 24),
               activeIcon: FaIcon(FontAwesomeIcons.house, size: 24),
               label: 'Home',
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.users, size: 24),
               activeIcon: FaIcon(FontAwesomeIcons.users, size: 24),
               label: 'Users',
             ),
             BottomNavigationBarItem(
-              icon: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                    color: _currentIndex == 2
-                        ? (isDarkMode ? Colors.white : Colors.black)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        width: 1.5)),
-                child: FaIcon(
-                  FontAwesomeIcons.plus,
-                  size: 18,
-                  // Invert color if selected
-                  color: _currentIndex == 2
-                      ? (isDarkMode ? Colors.black : Colors.white)
-                      : (isDarkMode ? Colors.white : Colors.black),
-                ),
-              ),
-              label: 'Post',
-            ),
-            const BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.video, size: 24),
               activeIcon: FaIcon(FontAwesomeIcons.video, size: 24),
               label: 'Shorts',
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.bell, size: 24),
               activeIcon: FaIcon(FontAwesomeIcons.solidBell, size: 24),
               label: 'Notifications',
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.user, size: 24),
               activeIcon: FaIcon(FontAwesomeIcons.solidUser, size: 24),
               label: 'Profile',
