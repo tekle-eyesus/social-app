@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/features/feed/screens/feed_screen.dart';
 import 'package:socialapp/screens/HomeScreen.dart';
 import 'package:socialapp/screens/notify_screen.dart';
 import 'package:socialapp/screens/post_screen.dart';
@@ -20,6 +21,7 @@ class _TabScreenState extends State<TabScreen> {
     const HomeScreen(),
     const UsersScreen(),
     PostScreen(),
+    FeedScreen(),
     const NotifyScreen(),
     const ProfileScreen(),
   ];
@@ -100,6 +102,11 @@ class _TabScreenState extends State<TabScreen> {
                 ),
               ),
               label: 'Post',
+            ),
+            const BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.video, size: 24),
+              activeIcon: FaIcon(FontAwesomeIcons.video, size: 24),
+              label: 'Shorts',
             ),
             const BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.bell, size: 24),

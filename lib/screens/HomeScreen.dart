@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
+import 'package:socialapp/screens/post_screen.dart';
 import 'package:socialapp/screens/search_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/offline_page.dart';
