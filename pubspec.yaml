@@ -51,6 +51,7 @@ dependencies:
   flutter_markdown_plus: ^1.0.3
   connect_guard: ^0.0.1
   cloudinary_public: ^0.23.1
+  video_player: ^2.10.0
 
 dev_dependencies:
   flutter_test:
