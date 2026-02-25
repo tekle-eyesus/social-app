@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/widget/custom_textfield.dart';
 import 'package:socialapp/widget/my_button.dart';
@@ -40,17 +41,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Technical Writer',
   ];
 
-  //add user data to db
+//add user data to db
   Future<void> addUserToDB(UserCredential? userData) async {
-    if (userData?.user != null && userData != null) {
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      await db.collection("users").doc(userData.user?.email).set({
-        "email": userData.user?.email,
-        "username": usernameController.text,
-        "profession": selectedProfession,
-        "profilePic":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTSKbCFe_QYSVH-4FpaszXvakr2Eti9eAJpQ&s"
-      }).onError((error, stackTrace) => print(error));
+    if (userData?.user != null) {
+      // 1. Create the Model Object
+      UserModel newUser = UserModel(
+        uid: userData!.user!.uid,
+        email: userData.user!.email!,
+        username: usernameController.text.trim(),
+        profession: selectedProfession ?? "Not specified",
+        profilePic:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTSKbCFe_QYSVH-4FpaszXvakr2Eti9eAJpQ&s",
+        followersCount: 0,
+        followingCount: 0,
+      );
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userData.user!.email)
+          .set(newUser.toMap())
+          .onError((error, stackTrace) => print("Error saving user: $error"));
     }
   }
 
