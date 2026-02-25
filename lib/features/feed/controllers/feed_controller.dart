@@ -40,9 +40,10 @@ class FeedController extends ChangeNotifier {
   Map<int, VideoPlayerController> get controllers => _controllers;
 
   // Initialize the first video immediately
+  int _currentIndex = 0;
+
   FeedController() {
     _initializeControllerAtIndex(0);
-    _playControllerAtIndex(0);
     _initializeControllerAtIndex(1); // Preload next
   }
 
@@ -50,7 +51,10 @@ class FeedController extends ChangeNotifier {
 
   /// CORE LOGIC: Called whenever the PageView snaps to a new index
   void onPageChanged(int index) {
+    _currentIndex = index;
+
     // 1. Play current video
+    _initializeControllerAtIndex(index);
     _playControllerAtIndex(index);
 
     // 2. Preload next video
@@ -79,15 +83,25 @@ class FeedController extends ChangeNotifier {
 
     _controllers[index] = controller;
 
-    await controller.initialize();
-    await controller.setLooping(true);
-    notifyListeners(); // Notify UI to redraw (remove loading spinner)
+    try {
+      await controller.initialize();
+      await controller.setLooping(true);
+      if (index == _currentIndex) {
+        _playControllerAtIndex(index);
+      }
+    } catch (error) {
+      debugPrint('Failed to load video at index $index: $error');
+      await controller.dispose();
+      _controllers.remove(index);
+    } finally {
+      notifyListeners(); // Notify UI to redraw (remove loading spinner)
+    }
   }
 
   void _playControllerAtIndex(int index) {
-    if (_controllers.containsKey(index)) {
-      _controllers[index]!.play();
-    }
+    final controller = _controllers[index];
+    if (controller == null || !controller.value.isInitialized) return;
+    controller.play();
   }
 
   void _stopControllerAtIndex(int index) {
