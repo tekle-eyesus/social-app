@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/auth/model/user_model.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
+import 'package:socialapp/profile/services/follow_service.dart';
 import 'package:socialapp/screens/chat_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -52,6 +55,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final textColor = isDark ? Colors.white : Colors.black;
     final secondaryText = Colors.grey.shade600;
 
+    final currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+    final FollowService followService = FollowService();
+    final bool isMe = currentUserEmail == widget.userEmail;
+
     return Scaffold(
       backgroundColor: bgColor,
       body: StreamBuilder<DocumentSnapshot>(
@@ -60,18 +67,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             .doc(widget.userEmail)
             .snapshots(),
         builder: (context, userSnapshot) {
-          String displayUsername = widget.username;
-          String displayProfilePic = widget.receiverImageUrl;
-          String displayProfession = "User";
-          String displayBio = "";
+          // String displayUsername = widget.username;
+          // String displayProfilePic = widget.receiverImageUrl;
+          // String displayProfession = "User";
+          // String displayBio = "";
 
-          if (userSnapshot.hasData && userSnapshot.data!.exists) {
-            final data = userSnapshot.data!.data() as Map<String, dynamic>;
-            displayUsername = data['username'] ?? widget.username;
-            displayProfilePic = data['profilePic'] ?? widget.receiverImageUrl;
-            displayProfession = data['profession'] ?? "User";
-            displayBio = data['about'] ?? "No bio available.";
-          }
+          // if (userSnapshot.hasData && userSnapshot.data!.exists) {
+          //   // final data = userSnapshot.data!.data() as Map<String, dynamic>;
+          //   // displayUsername = data['username'] ?? widget.username;
+          //   // displayProfilePic = data['profilePic'] ?? widget.receiverImageUrl;
+          //   // displayProfession = data['profession'] ?? "User";
+          //   // displayBio = data['about'] ?? "No bio available.";
+          // }
+
+          if (!userSnapshot.hasData)
+            return const Center(child: CircularProgressIndicator());
+
+          // Convert raw data to our Model
+          UserModel user = UserModel.fromMap(
+              userSnapshot.data!.data() as Map<String, dynamic>);
 
           return CustomScrollView(
             slivers: [
@@ -137,13 +151,55 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             child: CircleAvatar(
                               radius: 40,
                               backgroundColor: Colors.grey.shade200,
-                              backgroundImage: NetworkImage(displayProfilePic),
+                              backgroundImage: NetworkImage(user.profilePic),
                             ),
                           ),
                         ),
                         // Action Button (Message)
+
+                        if (!isMe)
+                          StreamBuilder<bool>(
+                            stream: followService.isFollowingStream(
+                                currentUserEmail, widget.userEmail),
+                            builder: (context, followSnapshot) {
+                              bool isFollowing = followSnapshot.data ?? false;
+
+                              return Positioned(
+                                bottom: 10,
+                                right: 83,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    followService.toggleFollow(
+                                      currentUserEmail,
+                                      widget.userEmail,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        isFollowing ? Colors.white : Colors.red,
+                                    side: isFollowing
+                                        ? const BorderSide(color: Colors.black)
+                                        : BorderSide.none,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(14)),
+                                    minimumSize: const Size(100, 37),
+                                  ),
+                                  child: Text(
+                                    isFollowing ? "Unfollow" : "Follow",
+                                    style: TextStyle(
+                                      color: isFollowing
+                                          ? Colors.black
+                                          : Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         Positioned(
-                          bottom: -2,
+                          bottom: 10,
                           right: 16,
                           child: Container(
                             margin: const EdgeInsets.only(top: 40),
@@ -155,8 +211,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     builder: (context) {
                                       return ChatScreen(
                                         receiverId: widget.userEmail,
-                                        receiverName: displayUsername,
-                                        receiverImageUrl: displayProfilePic,
+                                        receiverName: user.username,
+                                        receiverImageUrl: user.profilePic,
                                       );
                                     },
                                   ),
@@ -166,15 +222,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 side: BorderSide(
                                     color: Theme.of(context).brightness ==
                                             Brightness.dark
-                                        ? Colors.grey.shade600
+                                        ? Colors.grey.shade300
                                         : Colors.grey.shade300),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)),
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                               ),
-                              child: const FaIcon(FontAwesomeIcons.envelope,
-                                  size: 16),
+                              child: const FaIcon(
+                                FontAwesomeIcons.envelope,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -191,7 +250,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            displayUsername,
+                            user.username,
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
@@ -199,7 +258,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             ),
                           ),
                           Text(
-                            displayProfession,
+                            user.profession,
                             style: TextStyle(
                               fontSize: 14,
                               color: secondaryText,
@@ -208,7 +267,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           const SizedBox(height: 12),
                           // Bio
                           Text(
-                            displayBio,
+                            user.bio.isNotEmpty
+                                ? user.bio
+                                : "This user hasn't added a bio yet.",
                             style: TextStyle(
                               fontSize: 15,
                               height: 1.4,
@@ -233,9 +294,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           // Followers Count Row (Mockup for X style)
                           Row(
                             children: [
-                              _buildCount(textColor, "145", "Following"),
+                              _buildCount(
+                                textColor,
+                                user.followingCount.toString(),
+                                "Following",
+                              ),
                               const SizedBox(width: 15),
-                              _buildCount(textColor, "4,321", "Followers"),
+                              _buildCount(
+                                textColor,
+                                user.followersCount.toString(),
+                                "Followers",
+                              ),
                             ],
                           ),
                           //  Tabs (Posts / Replies / Media)
