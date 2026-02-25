@@ -67,23 +67,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             .doc(widget.userEmail)
             .snapshots(),
         builder: (context, userSnapshot) {
-          // String displayUsername = widget.username;
-          // String displayProfilePic = widget.receiverImageUrl;
-          // String displayProfession = "User";
-          // String displayBio = "";
-
-          // if (userSnapshot.hasData && userSnapshot.data!.exists) {
-          //   // final data = userSnapshot.data!.data() as Map<String, dynamic>;
-          //   // displayUsername = data['username'] ?? widget.username;
-          //   // displayProfilePic = data['profilePic'] ?? widget.receiverImageUrl;
-          //   // displayProfession = data['profession'] ?? "User";
-          //   // displayBio = data['about'] ?? "No bio available.";
-          // }
-
-          if (!userSnapshot.hasData)
+          if (!userSnapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
 
-          // Convert raw data to our Model
           UserModel user = UserModel.fromMap(
               userSnapshot.data!.data() as Map<String, dynamic>);
 
