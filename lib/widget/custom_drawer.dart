@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:socialapp/screens/HomeScreen.dart';
-import 'package:socialapp/screens/login_screen.dart';
+import 'package:socialapp/auth/screen/login_screen.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});

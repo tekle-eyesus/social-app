@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:socialapp/screens/login_screen.dart';
-import 'package:socialapp/screens/register_screen.dart';
+import 'package:socialapp/auth/screen/login_screen.dart';
+import 'package:socialapp/auth/screen/register_screen.dart';
 
 class LoginOrRegiter extends StatefulWidget {
   const LoginOrRegiter({super.key});

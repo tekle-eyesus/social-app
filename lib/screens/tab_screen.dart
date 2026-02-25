@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/features/feed/screens/feed_screen.dart';
 import 'package:socialapp/screens/HomeScreen.dart';
 import 'package:socialapp/screens/notify_screen.dart';
-import 'package:socialapp/screens/profile_screen.dart';
+import 'package:socialapp/profile/screen/profile_screen.dart';
 import 'package:socialapp/screens/users_screen.dart';
 
 class TabScreen extends StatefulWidget {
