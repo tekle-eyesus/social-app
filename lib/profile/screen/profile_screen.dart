@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/favorite_post_grid.dart';
 import 'package:socialapp/widget/post_grid_view.dart';
@@ -49,8 +50,10 @@ class _ProfileScreenState extends State<ProfileScreen>
           } else if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           } else if (snapshot.hasData) {
-            Map<String, dynamic> data = snapshot.data!;
-
+            // Map<String, dynamic> data = snapshot.data!;
+            UserModel user = UserModel.fromMap(
+              snapshot.data!,
+            );
             return NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 SliverAppBar(
@@ -101,14 +104,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                           child: CircleAvatar(
                             radius: 60,
                             backgroundColor: Colors.grey.shade200,
-                            backgroundImage: NetworkImage(data["profilePic"]),
+                            backgroundImage: NetworkImage(user.profilePic),
                           ),
                         ),
                         const SizedBox(height: 15),
 
                         // Name
                         Text(
-                          data['username'],
+                          user.username,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
@@ -119,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                         // Email
                         Text(
-                          data['email'],
+                          user.email,
                           style: TextStyle(
                             fontSize: 14,
                             color: secondaryText,
@@ -133,7 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildStatItem("Likes", "13", isDark),
+                            _buildStatItem("Following",
+                                user.followingCount.toString(), isDark),
                             Container(
                               height: 25,
                               width: 1,
@@ -141,7 +145,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 25),
                             ),
-                            _buildStatItem("Rating", "4.8", isDark),
+                            _buildStatItem("Followers",
+                                user.followersCount.toString(), isDark),
+                            Container(
+                              height: 25,
+                              width: 1,
+                              color: Colors.grey.shade300,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 25),
+                            ),
+                            _buildStatItem("Likes", "2", isDark),
                           ],
                         ),
 
