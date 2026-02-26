@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/screens/chat_screen.dart';
 
 class UsersScreen extends StatelessWidget {
@@ -8,6 +10,8 @@ class UsersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String currentUserEmail =
+        FirebaseAuth.instance.currentUser?.email ?? "";
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color bgColor = isDark ? Colors.black : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black;
@@ -16,18 +20,26 @@ class UsersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
-        child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUserEmail)
+              .collection('following')
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text("No users found"));
             }
 
-            List<DocumentSnapshot> users = snapshot.data!.docs;
+            if (!snapshot.hasData) {
+              return const Center(child: Text("No data available."));
+            }
+
+            final followingDocs = snapshot.data!.docs;
+
+            if (followingDocs.isEmpty) {
+              return const Center(child: Text("Not following anyone yet."));
+            }
 
             return CustomScrollView(
               slivers: [
@@ -35,7 +47,7 @@ class UsersScreen extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
                     child: Text(
-                      "USERS",
+                      "Following",
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -52,76 +64,90 @@ class UsersScreen extends StatelessWidget {
                     height: 110,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: users.length,
+                      itemCount: followingDocs.length,
                       padding: const EdgeInsets.only(left: 15),
                       itemBuilder: (context, index) {
-                        Map<String, dynamic> userData =
-                            users[index].data() as Map<String, dynamic>;
-
-                        // --- SIMPLE LOGIC FOR NOW ---
+                        final followedEmail = followingDocs[index].id;
                         bool isOnline = index % 2 == 0;
 
-                        return Container(
-                          width: 85,
-                          margin: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Stack(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 2),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: CircleAvatar(
-                                        radius: 32,
-                                        backgroundColor: Colors.grey.shade200,
-                                        backgroundImage: NetworkImage(
-                                            userData['profilePic']),
-                                      ),
-                                    ),
-                                  ),
-                                  if (isOnline)
-                                    Positioned(
-                                      bottom: 4,
-                                      right: 4,
-                                      child: Container(
-                                        width: 16,
-                                        height: 16,
-                                        decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2.5,
+                        return FutureBuilder<DocumentSnapshot>(
+                            future: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(followedEmail)
+                                .get(),
+                            builder: (context, userSnapshot) {
+                              if (!userSnapshot.hasData) {
+                                return const CircularProgressIndicator();
+                              }
+
+                              UserModel user = UserModel.fromMap(
+                                  userSnapshot.data!.data()
+                                      as Map<String, dynamic>);
+
+                              return Container(
+                                width: 85,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                                color: Colors.grey.shade300,
+                                                width: 2),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: CircleAvatar(
+                                              radius: 32,
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              backgroundImage:
+                                                  NetworkImage(user.profilePic),
+                                            ),
                                           ),
                                         ),
+                                        if (isOnline)
+                                          Positioned(
+                                            bottom: 4,
+                                            right: 4,
+                                            child: Container(
+                                              width: 16,
+                                              height: 16,
+                                              decoration: BoxDecoration(
+                                                color: Colors.green,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2.5,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    // Name
+                                    Text(
+                                      user.username,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
                                       ),
                                     ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 8),
-
-                              // Name
-                              Text(
-                                "${userData['username']}",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
+                              );
+                            });
                       },
                     ),
                   ),
@@ -178,99 +204,118 @@ class UsersScreen extends StatelessWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      Map<String, dynamic> userData =
-                          users[index].data() as Map<String, dynamic>;
+                      final followedEmail = followingDocs[index].id;
 
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) {
-                            return ChatScreen(
-                              receiverId: userData['email'],
-                              receiverName: userData['username'],
-                              receiverImageUrl: userData['profilePic'],
-                            );
-                          }));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          child: Row(
-                            children: [
-                              // Avatar
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundColor: Colors.grey.shade200,
-                                backgroundImage:
-                                    NetworkImage(userData['profilePic']),
-                              ),
-                              const SizedBox(width: 15),
+                      return FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(followedEmail)
+                              .get(),
+                          builder: (context, userSnapshot) {
+                            if (!userSnapshot.hasData) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
 
-                              // Content
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            UserModel userData = UserModel.fromMap(
+                                userSnapshot.data!.data()
+                                    as Map<String, dynamic>);
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (_) {
+                                  return ChatScreen(
+                                    receiverId: userData.email,
+                                    receiverName: userData.username,
+                                    receiverImageUrl: userData.profilePic,
+                                  );
+                                }));
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 12),
+                                child: Row(
                                   children: [
-                                    // Name + Age + Dot
-                                    Row(
+                                    // Avatar
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: Colors.grey.shade200,
+                                      backgroundImage:
+                                          NetworkImage(userData.profilePic),
+                                    ),
+                                    const SizedBox(width: 15),
+
+                                    // Content
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Name + Age + Dot
+                                          Row(
+                                            children: [
+                                              Text(
+                                                userData.username,
+                                                style: TextStyle(
+                                                  color: textColor,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              // Orange Dot (Online Status)
+                                              Container(
+                                                width: 6,
+                                                height: 6,
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.deepOrange,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          // Message Preview (Using profession as placeholder)
+                                          Text(
+                                            userData.profession ??
+                                                "New match! Say hello 👋",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: secondaryText,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          userData['username'],
+                                          "2 min", // Placeholder for actual timestamp
                                           style: TextStyle(
-                                            color: textColor,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        // Orange Dot (Online Status)
-                                        Container(
-                                          width: 6,
-                                          height: 6,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.deepOrange,
-                                            shape: BoxShape.circle,
+                                            color: secondaryText,
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 4),
-                                    // Message Preview (Using profession as placeholder)
-                                    Text(
-                                      userData['profession'] ??
-                                          "New match! Say hello 👋",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: secondaryText,
-                                        fontSize: 14,
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ),
-
-                              const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "2 min", // Placeholder for actual timestamp
-                                    style: TextStyle(
-                                      color: secondaryText,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                            );
+                          });
                     },
-                    childCount: users.length,
+                    childCount: followingDocs.length,
                   ),
                 ),
-
                 // Extra padding at bottom so nav bar doesn't cover last item
                 const SliverToBoxAdapter(
                   child: SizedBox(height: 80),
