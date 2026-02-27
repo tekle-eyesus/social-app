@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/profile/screen/edit_profile_screen.dart';
 import 'package:socialapp/widget/favorite_post_grid.dart';
 import 'package:socialapp/widget/post_grid_view.dart';
 
@@ -165,11 +166,20 @@ class _ProfileScreenState extends State<ProfileScreen>
                           children: [
                             Expanded(
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  // NAVIGATE TO EDIT PROFILE
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EditProfileScreen(user: user),
+                                    ),
+                                  ).then((_) => setState(
+                                      () {})); // Refresh profile after coming back from edit
+                                },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: isDark
-                                      ? Colors.grey.shade800
-                                      : Colors.black,
+                                  backgroundColor:
+                                      Colors.black, // Enforce tech theme
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
