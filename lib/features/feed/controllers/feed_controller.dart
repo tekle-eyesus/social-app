@@ -21,7 +21,7 @@ class FeedController extends ChangeNotifier {
       likes: 3400,
       comments: 120,
       videoUrl:
-          'https://assets.mixkit.co/videos/preview/mixkit-taking-photos-from-different-angles-of-a-model-34421-large.mp4',
+          'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
     ),
     VideoModel(
       id: '3',
