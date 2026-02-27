@@ -50,6 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: userData.user!.email!,
         username: usernameController.text.trim(),
         profession: selectedProfession ?? "Not specified",
+        joinedAt: DateTime.now(),
         profilePic:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTSKbCFe_QYSVH-4FpaszXvakr2Eti9eAJpQ&s",
         followersCount: 0,

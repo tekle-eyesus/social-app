@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/profile/services/follow_service.dart';
@@ -271,7 +272,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   size: 14, color: secondaryText),
                               const SizedBox(width: 5),
                               Text(
-                                "Joined September 2023", // You can store 'joinedAt' in Firebase later
+                                "Joined ${DateFormat('MMMM yyyy').format(user.joinedAt)}", // You can store 'joinedAt' in Firebase later
                                 style: TextStyle(
                                     color: secondaryText, fontSize: 14),
                               ),

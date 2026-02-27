@@ -4,6 +4,7 @@ class UserModel {
   final String username;
   final String profession;
   final String profilePic;
+  final DateTime joinedAt;
   final String bio;
   final int followersCount;
   final int followingCount;
@@ -14,6 +15,7 @@ class UserModel {
     required this.username,
     required this.profession,
     required this.profilePic,
+    required this.joinedAt,
     this.bio = "",
     this.followersCount = 0,
     this.followingCount = 0,
@@ -30,6 +32,9 @@ class UserModel {
       bio: map['bio'] ?? '',
       followersCount: map['followersCount'] ?? 0,
       followingCount: map['followingCount'] ?? 0,
+      joinedAt: map['joinedAt'] != null
+          ? DateTime.parse(map['joinedAt'])
+          : DateTime.now(),
     );
   }
 
@@ -44,6 +49,7 @@ class UserModel {
       'bio': bio,
       'followersCount': followersCount,
       'followingCount': followingCount,
+      'joinedAt': joinedAt,
     };
   }
 }
