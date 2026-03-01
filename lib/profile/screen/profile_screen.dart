@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
-import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/profile/screen/edit_profile_screen.dart';
+import 'package:socialapp/profile/screen/settings_screen.dart';
 import 'package:socialapp/widget/favorite_post_grid.dart';
 import 'package:socialapp/widget/post_grid_view.dart';
 
@@ -52,7 +52,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           } else if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           } else if (snapshot.hasData) {
-            // Map<String, dynamic> data = snapshot.data!;
             UserModel user = UserModel.fromMap(
               snapshot.data!,
             );
@@ -197,8 +196,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                             Expanded(
                               child: OutlinedButton(
                                 onPressed: () {
-                                  CustomSnackBar.showInfo(
-                                      context, "Settings coming soon!");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return SettingsScreen(userModel: user);
+                                    }),
+                                  );
                                 },
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: textColor,
