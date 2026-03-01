@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connect_guard/connect_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
-import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/screens/post_screen.dart';
 import 'package:socialapp/screens/search_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
-import 'package:socialapp/widget/offline_page.dart';
 import 'package:socialapp/widget/post_card.dart';
 import 'package:socialapp/widget/post_shimmer.dart';
 
@@ -20,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController postMessageController = TextEditingController();
-  Map<String, dynamic>? currentUserData;
+  UserModel? currentUser;
   @override
   void initState() {
     super.initState();
@@ -30,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _loadCurrentUserData() async {
     Map<String, dynamic>? userData = await fetchCurrentUserInfo();
     setState(() {
-      currentUserData = userData;
+      currentUser = UserModel.fromMap(userData!);
     });
   }
 
@@ -72,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   CircleAvatar(
                     backgroundImage: NetworkImage(
-                      currentUserData?['profilePic'] ??
+                      currentUser?.profilePic ??
                           'https://www.pngall.com/wp-content/uploads/5/Profile-PNG-High-Quality-Image.png',
                     ),
                   ),
@@ -150,7 +148,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       }),
                     );
                   } else {
-                    return Text("no data exist");
+                    return const Center(
+                      child: Text(
+                        "No Post Available",
+                        style: TextStyle(
+                            color: Colors.blueGrey,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    );
                   }
                 },
               ),
