@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:socialapp/screens/user_profile_screen.dart';
+import 'package:socialapp/widget/search_list_shimmer.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -110,7 +110,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return _buildShimmerList();
+      return const SearchListShimmer();
     }
 
     if (!_hasSearched) {
@@ -196,44 +196,6 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           trailing: Icon(Icons.arrow_forward_ios,
               size: 14, color: Colors.grey.shade300),
-        );
-      },
-    );
-  }
-
-// shimmer loading widget for search results
-  Widget _buildShimmerList() {
-    return ListView.builder(
-      itemCount: 5,
-      padding: const EdgeInsets.only(top: 10),
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey[200]!,
-            highlightColor: Colors.grey[50]!,
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(width: 120, height: 14, color: Colors.white),
-                    const SizedBox(height: 6),
-                    Container(width: 80, height: 12, color: Colors.white),
-                  ],
-                )
-              ],
-            ),
-          ),
         );
       },
     );
