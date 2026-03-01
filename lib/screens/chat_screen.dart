@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/widget/chat_message_input.dart';
 import 'package:socialapp/widget/message_bubble.dart';
 
@@ -93,11 +94,15 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.videocam_outlined),
-            onPressed: () {},
+            onPressed: () {
+              CustomSnackBar.showInfo(context, "Video call initiated");
+            },
           ),
           IconButton(
             icon: const Icon(Icons.call_outlined),
-            onPressed: () {},
+            onPressed: () {
+              CustomSnackBar.showInfo(context, "Voice call initiated");
+            },
           ),
         ],
       ),

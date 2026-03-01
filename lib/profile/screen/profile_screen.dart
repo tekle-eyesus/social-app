@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
+import 'package:socialapp/helpers/snackbar_helper.dart';
 import 'package:socialapp/profile/screen/edit_profile_screen.dart';
 import 'package:socialapp/widget/favorite_post_grid.dart';
 import 'package:socialapp/widget/post_grid_view.dart';
@@ -195,7 +196,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                             const SizedBox(width: 10),
                             Expanded(
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  CustomSnackBar.showInfo(
+                                      context, "Settings coming soon!");
+                                },
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: textColor,
                                   side: BorderSide(color: Colors.grey.shade300),
@@ -204,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12),
                                 ),
-                                child: const Text("Share",
+                                child: const Text("Settings",
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold)),
                               ),

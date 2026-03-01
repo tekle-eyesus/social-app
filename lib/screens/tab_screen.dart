@@ -19,7 +19,7 @@ class _TabScreenState extends State<TabScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const UsersScreen(),
-    FeedScreen(),
+    const FeedScreen(),
     const NotifyScreen(),
     const ProfileScreen(),
   ];
