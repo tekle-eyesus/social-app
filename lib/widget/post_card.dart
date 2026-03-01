@@ -218,7 +218,8 @@ class _PostItemState extends State<PostItem> {
                 width: double.infinity,
                 height: 250,
                 decoration: const BoxDecoration(
-                  color: Colors.grey, // placeholder color
+                  color:
+                      Color.fromARGB(255, 248, 244, 244), // placeholder color
                 ),
                 child: Image.network(
                   postData['imageUrl'],
@@ -226,8 +227,11 @@ class _PostItemState extends State<PostItem> {
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Center(
-                        child: CircularProgressIndicator(
-                            color: Colors.blue.shade900));
+                      child: CircularProgressIndicator(
+                        color: Colors.blue.shade900,
+                        strokeWidth: 2.0,
+                      ),
+                    );
                   },
                   errorBuilder: (context, error, stackTrace) =>
                       const Center(child: Icon(Icons.error)),
