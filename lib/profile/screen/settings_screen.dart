@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
+import 'package:socialapp/widget/forgot_password_sheet.dart';
 import 'edit_profile_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -63,11 +64,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           _buildSettingsTile(
-            icon: FontAwesomeIcons.lock,
-            title: "Change Password",
-            onTap: () =>
-                CustomSnackBar.showInfo(context, "Password flow coming soon!"),
-          ),
+              icon: FontAwesomeIcons.lock,
+              title: "Change Password",
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => ForgotPasswordSheet(title: "Change"),
+                );
+              }),
           _buildSwitchTile(
             icon: FontAwesomeIcons.fingerprint,
             title: "Biometric Login",

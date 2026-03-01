@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
 
 class ForgotPasswordSheet extends StatefulWidget {
-  const ForgotPasswordSheet({super.key});
+  String? title;
+  ForgotPasswordSheet({super.key, this.title = "Forgot"});
 
   @override
   State<ForgotPasswordSheet> createState() => _ForgotPasswordSheetState();
@@ -86,9 +86,12 @@ class _ForgotPasswordSheetState extends State<ForgotPasswordSheet> {
               children: [
                 Icon(Icons.lock_reset, color: primaryBlue, size: 28),
                 const SizedBox(width: 10),
-                const Text(
-                  "Forgot Password",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  "${widget.title} Password",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
