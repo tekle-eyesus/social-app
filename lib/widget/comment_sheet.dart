@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/widget/comment_item.dart';
 import 'package:socialapp/widget/comment_shimmer.dart';
@@ -57,6 +58,7 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
     return Column(
       children: [
         Container(
@@ -134,9 +136,10 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
                       comments[index].data() as Map<String, dynamic>;
 // Mock logic to determine if this comment has replies (for demo purposes)
                   final bool mockHasReplies = index % 3 == 0 && index != 0;
-
                   return CommentItem(
-                      commentData: comment, hasReplies: mockHasReplies);
+                    commentData: comment,
+                    hasReplies: mockHasReplies,
+                  );
                 },
               );
             },
@@ -231,6 +234,7 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
           FirebaseAuth.instance.currentUser!.email.toString();
       Map<String, dynamic>? userData =
           await fetchUserDataById(currentUserEmail);
+      UserModel currentUser = UserModel.fromMap(userData!);
 
       await FirebaseFirestore.instance
           .collection('posts')
@@ -238,8 +242,8 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
           .collection('comments')
           .add({
         'userId': currentUserEmail,
-        'username': widget.userInfo['username'],
-        'profilePic': widget.userInfo['profilePic'],
+        'username': currentUser.username,
+        'profilePic': currentUser.profilePic,
         'commentText': _commentController.text.trim(),
         'timestamp': DateTime.now().toIso8601String(),
         'likes': [], // Initialize empty likes
@@ -255,6 +259,7 @@ class _CommentSheetContentState extends State<CommentSheetContent> {
       // Dismiss keyboard
       FocusScope.of(context).unfocus();
     } catch (e) {
+      Navigator.pop(context);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Error: $e")));
     } finally {

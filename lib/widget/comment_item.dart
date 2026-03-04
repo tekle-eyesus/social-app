@@ -22,7 +22,9 @@ class CommentItem extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey.shade200,
-            backgroundImage: NetworkImage(commentData['profilePic']),
+            backgroundImage: NetworkImage(
+              commentData['profilePic'] ?? 'https://via.placeholder.com/150 ',
+            ),
             onBackgroundImageError: (_, __) => const Icon(Icons.person),
           ),
           const SizedBox(width: 12),
