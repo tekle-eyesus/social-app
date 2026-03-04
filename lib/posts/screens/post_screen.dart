@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -61,21 +60,6 @@ class _PostScreenState extends State<PostScreen> {
     setState(() {
       _image = null;
     });
-  }
-
-  // Refactored: Uploads image and returns URL (or null)
-  Future<String?> uploadImage(File image) async {
-    try {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child('uploads/$fileName');
-      UploadTask uploadTask = firebaseStorageRef.putFile(image);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      return await taskSnapshot.ref.getDownloadURL();
-    } catch (e) {
-      print("Error uploading image: $e");
-      return null;
-    }
   }
 
   void handlePost() async {
