@@ -107,8 +107,8 @@ class _PostScreenState extends State<PostScreen> {
 
         CustomSnackBar.showSuccess(context, "Posted successfully!");
 
-        // Optional: Navigate back
-        // Navigator.pop(context);
+        // Navigate back
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
