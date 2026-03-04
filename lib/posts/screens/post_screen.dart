@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
+import 'package:socialapp/posts/services/post_service.dart';
 
 class PostScreen extends StatefulWidget {
   const PostScreen({super.key});
@@ -18,6 +19,7 @@ class _PostScreenState extends State<PostScreen> {
   File? _image;
   final picker = ImagePicker();
   final TextEditingController _messageController = TextEditingController();
+  final PostService _postService = PostService();
 
   // UX State variables
   bool _isPosting = false;
@@ -77,7 +79,7 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   void handlePost() async {
-    if (_messageController.text.isEmpty && _image == null) {
+    if (_messageController.text.trim().isEmpty && _image == null) {
       CustomSnackBar.showWarning(
         context,
         "Please add a message or an image before posting.",
@@ -85,61 +87,36 @@ class _PostScreenState extends State<PostScreen> {
       return;
     }
 
-    // 1. SET LOADING STATE
     setState(() {
       _isPosting = true;
     });
 
     try {
-      FirebaseFirestore db = FirebaseFirestore.instance;
+      await _postService.createPost(
+        currentUser: FirebaseAuth.instance.currentUser!,
+        content: _messageController.text.trim(),
+        imageFile: _image,
+      );
 
-      // Get fresh user data to ensure profession/name are up to date
-      DocumentSnapshot userDoc =
-          await db.collection("users").doc(currentUser!.email).get();
-      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-
-      String? imageUrl;
-
-      // 2. UPLOAD IMAGE IF EXISTS
-      if (_image != null) {
-        imageUrl = await uploadImage(_image!);
-      }
-
-      // 3. CREATE POST DOCUMENT
-      await db.collection("posts").add({
-        "imageUrl": imageUrl, // Can be null now, handled by UI later
-        "content": _messageController.text,
-        "email": currentUser!.email,
-        "profession": userData["profession"] ?? "User",
-        "username": userData['username'],
-        "profile": userData['profilePic'],
-        "likesCount": 0,
-        "commentsCount": 0,
-        "likedBy": [],
-        "timeStamp": DateTime.now().toIso8601String(),
-      });
-
-      // 4. RESET UI
       if (mounted) {
         _messageController.clear();
         setState(() {
           _image = null;
           _isPosting = false;
         });
-// go back logic
-        CustomSnackBar.showSuccess(
-          context,
-          "Posted successfully!",
-        );
+
+        CustomSnackBar.showSuccess(context, "Posted successfully!");
+
+        // Optional: Navigate back
+        // Navigator.pop(context);
       }
     } catch (e) {
-      setState(() {
-        _isPosting = false;
-      });
-      CustomSnackBar.showError(
-        context,
-        "Failed to post. Please try again.",
-      );
+      if (mounted) {
+        setState(() {
+          _isPosting = false;
+        });
+        CustomSnackBar.showError(context, e.toString());
+      }
     }
   }
 
