@@ -20,7 +20,9 @@ class MessageBubble extends StatelessWidget {
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: isSentByMe ? Colors.black : Colors.white,
+          color: isSentByMe
+              ? (type == "image" ? Colors.black.withAlpha(200) : Colors.black)
+              : Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -33,8 +35,9 @@ class MessageBubble extends StatelessWidget {
           ),
           // ... shadow logic ...
         ),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 12), // Adjusted padding
+        padding: type == 'image'
+            ? const EdgeInsets.all(8)
+            : const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
