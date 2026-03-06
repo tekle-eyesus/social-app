@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/snackbar_helper.dart';
+import 'package:socialapp/theme/theme_provider.dart';
 import 'package:socialapp/widget/forgot_password_sheet.dart';
 import 'edit_profile_screen.dart';
 
@@ -17,7 +18,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   // Local State for Toggles (In a real app, use Provider/Bloc)
-  bool _isDarkMode = false;
   bool _pushNotifications = true;
   bool _emailNotifications = false;
   bool _biometricLogin = false;
@@ -91,12 +91,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSwitchTile(
             icon: FontAwesomeIcons.moon,
             title: "Dark Mode",
-            value: _isDarkMode,
+            value: themeProvider.isDarkMode,
             onChanged: (val) {
-              setState(() => _isDarkMode = val);
-              // TODO: Implement global theme toggle logic here
+              themeProvider.setDarkMode(val);
               CustomSnackBar.showInfo(context,
-                  _isDarkMode ? "Dark Mode Enabled" : "Light Mode Enabled");
+                  val ? "Dark Mode Enabled" : "Light Mode Enabled");
             },
           ),
           _buildSettingsTile(

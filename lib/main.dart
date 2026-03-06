@@ -6,6 +6,7 @@ import 'package:socialapp/profile/screen/profile_screen.dart';
 import 'package:socialapp/screens/users_screen.dart';
 import 'package:socialapp/theme/dark_mode.dart';
 import 'package:socialapp/theme/light_mode.dart';
+import 'package:socialapp/theme/theme_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
@@ -20,16 +21,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const AuthUser(),
-      theme: lightMode,
-      darkTheme: darkMode,
-      routes: {
-        "/usersScreen": (context) => const UsersScreen(),
-        "/profileScreen": (context) => const ProfileScreen(),
-        "/postScreen": (context) => const ProfileScreen(),
-      },
+    return ListenableBuilder(
+      listenable: themeProvider,
+      builder: (context, _) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const AuthUser(),
+        theme: lightMode,
+        darkTheme: darkMode,
+        themeMode: themeProvider.themeMode,
+        routes: {
+          "/usersScreen": (context) => const UsersScreen(),
+          "/profileScreen": (context) => const ProfileScreen(),
+          "/postScreen": (context) => const ProfileScreen(),
+        },
+      ),
     );
   }
 }
