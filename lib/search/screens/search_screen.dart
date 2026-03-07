@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/screens/user_profile_screen.dart';
+import 'package:socialapp/search/widgets/empty_result.dart';
 import 'package:socialapp/widget/search_list_shimmer.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -131,20 +132,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     if (_searchResults.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(FontAwesomeIcons.faceFrownOpen,
-                size: 60, color: Colors.grey.shade200),
-            const SizedBox(height: 15),
-            Text(
-              "No user found named \"${_searchController.text}\"",
-              style: TextStyle(color: Colors.grey.shade500),
-            ),
-          ],
-        ),
-      );
+      return EmptyResult(searchController: _searchController);
     }
 
     return ListView.builder(

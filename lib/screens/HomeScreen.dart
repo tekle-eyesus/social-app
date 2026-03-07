@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:socialapp/auth/model/user_model.dart';
 import 'package:socialapp/helpers/helper_functions.dart';
 import 'package:socialapp/posts/screens/post_screen.dart';
-import 'package:socialapp/screens/search_screen.dart';
+import 'package:socialapp/search/screens/search_screen.dart';
 import 'package:socialapp/theme/app_colors.dart';
 import 'package:socialapp/widget/post_card.dart';
 import 'package:socialapp/widget/post_shimmer.dart';
